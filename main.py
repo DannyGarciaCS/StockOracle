@@ -9,7 +9,8 @@ def main():
 
     # Initializes data
     settings = File("data/settings.datcs")
-    window = Window(settings["screenX"], settings["screenY"], settings["displayX"], settings["displayY"], "PyScreen")
+    window = Window(settings.get("screenX"), settings.get("screenY"),
+    settings.get("displayX"), settings.get("displayY"), "Market Oracle")
     scene = "predictions"
     running = True
 
