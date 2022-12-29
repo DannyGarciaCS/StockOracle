@@ -10,15 +10,16 @@ class Window:
         pg.init()
         pg.display.set_caption(title)
 
-        # Arguments
         self.screenX = screenX
         self.screenY = screenY
         self.displayX = displayX
         self.displayY = displayY
 
-        # Native properties
         self.screen = pg.display.set_mode((self.screenX, self.screenY))
         self.display = pg.Surface((self.displayX, self.displayY))
+
+        self.aspectX = self.displayX / self.screenX
+        self.aspectY = self.displayY / self.screenY
 
     # Updates window surfaces
     def update(self):

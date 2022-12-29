@@ -1,4 +1,5 @@
 # Imports
+from src.classes.Hint import Hint
 import pygame as pg
 
 # Initializes predictions scene
@@ -7,13 +8,15 @@ def boot(window, settings):
     # Scene variables
     clock = pg.time.Clock()
 
+    hints = [Hint(window, (300, 700), "Sample Message Bla Bla Bla\nAnother Message")]
+
     # Main scene loop
     while True:
 
-        # Updates window
-        window.update()
-        window.fill((0, 0, 0))
-        clock.tick(60)
+        # Mouse
+        position = list(pg.mouse.get_pos())
+        position[0] = position[0] * window.aspectX
+        position[1] = position[1] * window.aspectY
 
         # Event handling
         for event in pg.event.get():
@@ -31,3 +34,10 @@ def boot(window, settings):
 
         pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
         pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
+
+        for hint in hints: hint.draw()
+
+        # Updates window
+        window.update()
+        window.fill((200, 200, 220))
+        clock.tick(60)
