@@ -24,20 +24,21 @@ def boot(window, settings):
             # Cross is pressed
             if event.type == pg.QUIT: return False, ""
 
-        pg.draw.rect(window.display, (150, 50, 50), pg.Rect(0, 0, 125, 1080))
+        pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
+        
         pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 15, 95, 95))
         pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 125, 95, 95))
         pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 235, 95, 95))
         pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 970, 95, 95))
 
-        pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
+        # pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
 
-        pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
-        pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
+        # pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
+        # pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
 
         for hint in hints: hint.draw()
 
         # Updates window
         window.update()
-        window.fill((200, 200, 220))
+        window.fill((57, 56, 61))
         clock.tick(60)
