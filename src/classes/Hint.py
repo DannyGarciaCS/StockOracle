@@ -34,8 +34,12 @@ class Hint:
         if self.show:
 
             # Draws body of hint
-            pg.draw.rect(self.window.display, self.color, pg.Rect(*self.position, *self.size), border_radius=self.borderRadius)
-            pg.draw.rect(self.window.display, (0, 0, 0), pg.Rect(*self.position, *self.size), border_radius=self.borderRadius, width=self.borderSize)
+            pg.draw.rect(self.window.display, self.color, pg.Rect(
+            *self.position, *self.size), border_radius=self.borderRadius)
+
+            pg.draw.rect(self.window.display, (0, 0, 0), pg.Rect(
+            *self.position, *self.size), border_radius=self.borderRadius, width=self.borderSize)
+            
             self.window.blit(self.text, (self.position[0] + self.margin, self.position[1] + self.margin))
 
             # Draws hint pointer
@@ -44,23 +48,35 @@ class Hint:
                 pg.draw.polygon(self.window.display, self.color, [
                 (self.position[0] + self.pointerMargin, self.position[1] + self.borderSize),
                 (self.position[0] + self.pointerMargin + self.pointerSize, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2, self.position[1] - self.pointerSize + self.borderSize)])
+                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
+                self.position[1] - self.pointerSize + self.borderSize)])
+
                 pg.draw.line(self.window.display, (0, 0, 0),
                 (self.position[0] + self.pointerMargin, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2, self.position[1] - self.pointerSize + self.borderSize), width=self.borderSize)
+                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
+                self.position[1] - self.pointerSize + self.borderSize), width=self.borderSize)
+
                 pg.draw.line(self.window.display, (0, 0, 0),
                 (self.position[0] + self.pointerMargin + self.pointerSize, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2, self.position[1] - self.pointerSize + self.borderSize), width=self.borderSize)
+                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
+                self.position[1] - self.pointerSize + self.borderSize), width=self.borderSize)
 
             elif self.pointerDirection == "D":
 
                 pg.draw.polygon(self.window.display, self.color, [
                 (self.position[0] + self.pointerMargin, self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize, self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2, self.position[1] + self.pointerSize + self.size[1] - self.borderSize)])
+                (self.position[0] + self.pointerMargin + self.pointerSize,
+                self.position[1] + self.size[1] - self.borderSize),
+                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
+                self.position[1] + self.pointerSize + self.size[1] - self.borderSize)])
+
                 pg.draw.line(self.window.display, (0, 0, 0),
                 (self.position[0] + self.pointerMargin, self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2, self.position[1] + self.pointerSize + self.size[1] - self.borderSize), width=self.borderSize)
+                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
+                self.position[1] + self.pointerSize + self.size[1] - self.borderSize), width=self.borderSize)
+
                 pg.draw.line(self.window.display, (0, 0, 0),
-                (self.position[0] + self.pointerMargin + self.pointerSize, self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2, self.position[1] + self.pointerSize + self.size[1] - self.borderSize), width=self.borderSize)
+                (self.position[0] + self.pointerMargin + self.pointerSize,
+                self.position[1] + self.size[1] - self.borderSize),
+                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
+                self.position[1] + self.pointerSize + self.size[1] - self.borderSize), width=self.borderSize)
