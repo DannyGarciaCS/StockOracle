@@ -11,16 +11,23 @@ class Button:
         self.position = position
         self.size = size
 
+        self.status = "base"
+        self.send = False
+
         # Default visual arguments
         self.visuals = {
-            "color": (50, 50, 52),
+            "colorBase": (50, 50, 52),
+            "colorHighlight": (69, 70, 72),
+            "colorClick": (45, 45, 47),
             "drawBorder": False,
             "borderWidth": 1,
             "borderColor": (0, 0, 0),
             "borderRadius": 0,
 
             "drawIcon": False,
-            "icon": "media/predictionsIconBase.png",
+            "iconBase": "media/predictionsIconBase.png",
+            "iconHighlight": "media/predictionsIconHighlight.png",
+            "iconClick": "media/predictionsIconClick.png",
             "iconSize": (int(self.size[0] * 0.9), int(self.size[1] * 0.9)),
 
             "drawText": False,
@@ -35,8 +42,12 @@ class Button:
                 self.visuals[key] = kwargs[key]
 
         # Icon preparation (Extract if dynamic buttons needed)
-        self.icon = pg.image.load(self.visuals["icon"]).convert_alpha()
-        self.icon = pg.transform.scale(self.icon, self.visuals["iconSize"])
+        self.iconBase = pg.image.load(self.visuals["iconBase"]).convert_alpha()
+        self.iconBase = pg.transform.scale(self.iconBase, self.visuals["iconSize"])
+        self.iconHighlight = pg.image.load(self.visuals["iconHighlight"]).convert_alpha()
+        self.iconHighlight = pg.transform.scale(self.iconHighlight, self.visuals["iconSize"])
+        self.iconClick = pg.image.load(self.visuals["iconClick"]).convert_alpha()
+        self.iconClick = pg.transform.scale(self.iconClick, self.visuals["iconSize"])
 
         # Text preparation (Extract if dynamic buttons needed)
         self.font = pg.font.Font("media/latoBlack.ttf", self.visuals["textSize"])
@@ -44,7 +55,22 @@ class Button:
         self.textSize = self.font.size(self.visuals["text"])
     
     # Updates button's status
-    def update(self, position):
+    def update(self, position, pressed, released):
+
+        if self.position[0] < position[0] < self.position[0] + self.size[0] and \
+        self.position[1] < position[1] < self.position[1] + self.size[1]:
+
+            # Defines button visuals
+            if pressed[0]: self.status = "click"
+            else: self.status = "highlight"
+
+            # Executes button signal if button released
+            if released == 1: self.send = True
+            else: self.send = False
+
+        else: self.status = "base"
+
+
 
         self.draw()
 
@@ -52,8 +78,15 @@ class Button:
     def draw(self):
 
         # Draws body of button
-        pg.draw.rect(self.window.display, self.visuals["color"],
-        pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
+        if self.status == "base":
+            pg.draw.rect(self.window.display, self.visuals["colorBase"],
+            pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
+        elif self.status == "highlight":
+            pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
+            pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
+        elif self.status == "click":
+            pg.draw.rect(self.window.display, self.visuals["colorClick"],
+            pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
 
         # Draws border
         if self.visuals["drawBorder"]:
@@ -62,8 +95,18 @@ class Button:
 
         # Draws icon
         if self.visuals["drawIcon"]:
-            self.window.blit(self.icon, (self.position[0] + self.size[0] / 2 - self.visuals["iconSize"][0] / 2,
-            self.position[1] + self.size[1] / 2 - self.visuals["iconSize"][1] / 2))
+            if self.status == "base":
+                self.window.blit(self.iconBase, (self.position[0] + self.size[0] / 2 -
+                self.visuals["iconSize"][0] / 2, self.position[1] + self.size[1] / 2 -
+                self.visuals["iconSize"][1] / 2))
+            elif self.status == "highlight":
+                self.window.blit(self.iconHighlight, (self.position[0] + self.size[0] / 2 -
+                self.visuals["iconSize"][0] / 2, self.position[1] + self.size[1] / 2 -
+                self.visuals["iconSize"][1] / 2))
+            elif self.status == "click":
+                self.window.blit(self.iconClick, (self.position[0] + self.size[0] / 2 -
+                self.visuals["iconSize"][0] / 2, self.position[1] + self.size[1] / 2 -
+                self.visuals["iconSize"][1] / 2))
 
         # Draws text
         if self.visuals["drawText"]:
