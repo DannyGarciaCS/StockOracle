@@ -10,16 +10,24 @@ def boot(window, settings):
 
     buttons = [
         Button(window, (15, 15), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/screenerIconBase.png",
-        iconHighlight="media/screenerIconHighlight.png", iconClick="media/screenerIconClick.png", iconSize=(60, 60)),
+        iconHighlight="media/screenerIconHighlight.png", iconClick="media/screenerIconClick.png",
+        hintParameters = (window, (15, 140), "Go to stock screener (Not Implemented Yet)", "U", 34), drawHint = True,
+        iconSize=(60, 60)),
 
         Button(window, (15, 125), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/rulesIconBase.png",
-        iconHighlight="media/rulesIconHighlight.png", iconClick="media/rulesIconClick.png", iconSize=(60, 60)),
+        iconHighlight="media/rulesIconHighlight.png", iconClick="media/rulesIconClick.png",
+        hintParameters = (window, (15, 250), "Go to rules editor (Not Implemented Yet)", "U", 34), drawHint = True,
+        iconSize=(60, 60)),
 
         Button(window, (15, 235), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/predictionsIconBase.png",
-        iconHighlight="media/predictionsIconHighlight.png", iconClick="media/predictionsIconClick.png", iconSize=(60, 60)),
+        iconHighlight="media/predictionsIconHighlight.png", iconClick="media/predictionsIconClick.png",
+        hintParameters = (window, (15, 360), "Refresh predictions dashboard", "U", 34), drawHint = True,
+        iconSize=(60, 60)),
 
         Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
-        iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png", iconSize=(60, 60))
+        iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
+        hintParameters = (window, (15, 880), "Change settings", "D", 34), drawHint = True,
+        iconSize=(60, 60))
     ]
 
     # Main scene loop
@@ -41,19 +49,22 @@ def boot(window, settings):
             # Mouse button is released
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
+        # Draws navigation menu
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
-        
-        # pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 15, 95, 95))
-        # pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 125, 95, 95))
-        # pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 235, 95, 95))
-        # pg.draw.rect(window.display, (200, 75, 75), pg.Rect(15, 970, 95, 95))
-
-        # pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
-
-        # pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
-        # pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
-
         for button in buttons: button.update(position, pressed, released)
+
+        pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
+        pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
+        pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
+
+        # Draws overlay elements
+        for button in buttons: button.drawHint()
+
+        # Handles navigation buttons
+        if buttons[0].send: pass
+        if buttons[1].send: pass
+        if buttons[2].send: return True, "predictions"
+        if buttons[3].send: return True, "settings"
 
         # Updates window
         window.update()

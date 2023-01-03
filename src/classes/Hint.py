@@ -5,21 +5,21 @@ import pygame as pg
 class Hint:
 
     # Constructor
-    def __init__(self, window, position, text, show=True, pointerDirection="U", pointerMargin=16):
+    def __init__(self, window, position, text, pointerDirection="U", pointerMargin=16):
 
         self.window = window
         self.position = position
-        self.show = show
         self.pointerDirection = pointerDirection
         self.pointerMargin = pointerMargin
 
         self.color = (50, 50, 52)
         self.fontColor = (227, 229, 233)
-        self.fontSize = 25
+        self.fontSize = 22
         self.margin = 15
         self.borderRadius = 8
         self.pointerSize = 26
-        self.borderSize = 2
+        self.borderSize = 1
+        self.show = False
 
         self.font = pg.font.Font("media/latoBlack.ttf", self.fontSize)
         self.text = self.font.render(text, True, self.fontColor)

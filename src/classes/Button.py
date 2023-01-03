@@ -1,4 +1,5 @@
 # Imports
+from src.classes.Hint import Hint
 import pygame as pg
 
 # Button class
@@ -33,7 +34,10 @@ class Button:
             "drawText": False,
             "text": "Button",
             "textSize": 25,
-            "textColor": (227, 229, 233)
+            "textColor": (227, 229, 233),
+
+            "drawHint": False,
+            "hintParameters": (self.window, self.position, "Button description", "U", 16)
         }
 
         # Replaces all passed visual arguments
@@ -53,6 +57,10 @@ class Button:
         self.font = pg.font.Font("media/latoBlack.ttf", self.visuals["textSize"])
         self.text = self.font.render(self.visuals["text"], True, self.visuals["textColor"])
         self.textSize = self.font.size(self.visuals["text"])
+
+        self.hint = None
+        if self.visuals["drawHint"]:
+            self.hint = Hint(*self.visuals["hintParameters"])
     
     # Updates button's status
     def update(self, position, pressed, released):
@@ -68,9 +76,12 @@ class Button:
             if released == 1: self.send = True
             else: self.send = False
 
-        else: self.status = "base"
+            if self.visuals["drawHint"]: self.hint.show = True
 
-
+        else:
+            
+            self.status = "base"
+            if self.visuals["drawHint"]: self.hint.show = False
 
         self.draw()
 
@@ -112,3 +123,7 @@ class Button:
         if self.visuals["drawText"]:
             self.window.blit(self.text, (self.position[0] + self.size[0] / 2 - self.textSize[0] / 2,
             self.position[1] + self.size[1] / 2 - self.textSize[1] / 2))
+
+    # Draws hint
+    def drawHint(self):
+        if self.visuals["drawHint"]: self.hint.draw()
