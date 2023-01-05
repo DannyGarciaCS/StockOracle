@@ -1,9 +1,8 @@
 # Imports
 from src.classes.Button import Button
 import pygame as pg
-from sys import exit
 
-# Initializes predictions scene
+# Initializes settings scene
 def boot(window, settings):
 
     # Scene variables
@@ -53,10 +52,6 @@ def boot(window, settings):
         # Draws navigation menu
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
         for button in buttons: button.update(position, pressed, released)
-
-        pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
-        pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
-        pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
 
         # Draws overlay elements
         for button in buttons: button.drawHint()
