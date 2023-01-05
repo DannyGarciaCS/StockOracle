@@ -1,5 +1,6 @@
 # Imports
 from src.classes.Button import Button
+from src.classes.Scrollbar import Scrollbar
 import pygame as pg
 
 # Initializes settings scene
@@ -30,6 +31,8 @@ def boot(window, settings):
         iconSize=(60, 60))
     ]
 
+    scrollbar = Scrollbar(window, (1885, 15), (20, 1050), 100, radius=10)
+
     # Main scene loop
     while True:
 
@@ -49,12 +52,18 @@ def boot(window, settings):
             # Mouse button is released
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
-        # Draws navigation menu
+        # Draws main backgrounds
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
+        pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 15, 1730, 1050), border_radius=10)
+
+        # Updates custom objects
         for button in buttons: button.update(position, pressed, released)
+        scrollbar.update(position, pressed, released)
 
         # Draws overlay elements
         for button in buttons: button.drawHint()
+
+        
 
         # Handles navigation buttons
         if buttons[0].send: pass

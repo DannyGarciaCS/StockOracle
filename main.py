@@ -12,7 +12,7 @@ def main():
     settings = File("data/settings.datcs")
     window = Window(settings.get("screenX"), settings.get("screenY"),
     settings.get("displayX"), settings.get("displayY"), "Market Oracle")
-    scene = "predictions"
+    scene = "settings"
     running = True
 
     # Main program loop
