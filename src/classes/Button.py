@@ -68,6 +68,8 @@ class Button:
         if self.position[0] < position[0] < self.position[0] + self.size[0] and \
         self.position[1] < position[1] < self.position[1] + self.size[1]:
 
+            pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
+
             # Defines button visuals
             if pressed[0]: self.status = "click"
             else: self.status = "highlight"
@@ -78,7 +80,9 @@ class Button:
 
             if self.visuals["drawHint"]: self.hint.show = True
 
-        else:
+        elif self.status in ["click", "highlight"]:
+
+            pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
             
             self.status = "base"
             if self.visuals["drawHint"]: self.hint.show = False

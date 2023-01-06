@@ -31,7 +31,7 @@ def boot(window, settings):
         iconSize=(60, 60))
     ]
 
-    scrollbar = Scrollbar(window, (1885, 15), (20, 1050), 100, radius=10)
+    scrollbar = Scrollbar(window, (1885, 15), (20, 1050), 1050, radius=10)
 
     # Main scene loop
     while True:
