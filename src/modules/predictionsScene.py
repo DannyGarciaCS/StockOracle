@@ -12,17 +12,17 @@ def boot(window, settings):
     buttons = [
         Button(window, (15, 15), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/screenerIconBase.png",
         iconHighlight="media/screenerIconHighlight.png", iconClick="media/screenerIconClick.png",
-        hintParameters = (window, (15, 140), "Go to stock screener (Not Implemented Yet)", "U", 34), drawHint = True,
+        hintParameters = (window, (15, 140), "Stock screener (Not Implemented Yet)", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
         Button(window, (15, 125), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/rulesIconBase.png",
         iconHighlight="media/rulesIconHighlight.png", iconClick="media/rulesIconClick.png",
-        hintParameters = (window, (15, 250), "Go to rules editor (Not Implemented Yet)", "U", 34), drawHint = True,
+        hintParameters = (window, (15, 250), "Rules editor (Not Implemented Yet)", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
         Button(window, (15, 235), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/predictionsIconBase.png",
         iconHighlight="media/predictionsIconHighlight.png", iconClick="media/predictionsIconClick.png",
-        hintParameters = (window, (15, 360), "Refresh predictions dashboard", "U", 34), drawHint = True,
+        hintParameters = (window, (15, 360), "Predictions dashboard", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
         Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",

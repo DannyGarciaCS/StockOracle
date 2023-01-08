@@ -1,6 +1,5 @@
 # Imports
 from src.classes.Button import Button
-from src.classes.Scrollbar import Scrollbar
 import pygame as pg
 
 # Initializes settings scene
@@ -9,20 +8,25 @@ def boot(window, settings):
     # Scene variables
     clock = pg.time.Clock()
 
+    # Page title
+    titleFont = pg.font.Font("media/latoBold.ttf", 35)
+    title = titleFont.render("SETTINGS", True, (227, 229, 233))
+    titleShadow = titleFont.render("SETTINGS", True, (45, 45, 47))
+
     buttons = [
         Button(window, (15, 15), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/screenerIconBase.png",
         iconHighlight="media/screenerIconHighlight.png", iconClick="media/screenerIconClick.png",
-        hintParameters = (window, (15, 140), "Go to stock screener (Not Implemented Yet)", "U", 34), drawHint = True,
+        hintParameters = (window, (15, 140), "Stock screener (Not Implemented Yet)", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
         Button(window, (15, 125), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/rulesIconBase.png",
         iconHighlight="media/rulesIconHighlight.png", iconClick="media/rulesIconClick.png",
-        hintParameters = (window, (15, 250), "Go to rules editor (Not Implemented Yet)", "U", 34), drawHint = True,
+        hintParameters = (window, (15, 250), "Rules editor (Not Implemented Yet)", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
         Button(window, (15, 235), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/predictionsIconBase.png",
         iconHighlight="media/predictionsIconHighlight.png", iconClick="media/predictionsIconClick.png",
-        hintParameters = (window, (15, 360), "Refresh predictions dashboard", "U", 34), drawHint = True,
+        hintParameters = (window, (15, 360), "Predictions dashboard", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
         Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
@@ -30,8 +34,6 @@ def boot(window, settings):
         hintParameters = (window, (15, 880), "Change settings", "D", 34), drawHint = True,
         iconSize=(60, 60))
     ]
-
-    scrollbar = Scrollbar(window, (1885, 15), (20, 1050), 1050, radius=10)
 
     # Main scene loop
     while True:
@@ -52,18 +54,17 @@ def boot(window, settings):
             # Mouse button is released
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
-        # Draws main backgrounds
+        # Draws navigation menu
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
-        pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 15, 1730, 1050), border_radius=10)
-
-        # Updates custom objects
+        pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 70, 1765, 995), border_radius=10)
         for button in buttons: button.update(position, pressed, released)
-        scrollbar.update(position, pressed, released)
+
+        # Draws page title
+        window.blit(titleShadow, (155, 20))
+        window.blit(title, (155, 15))
 
         # Draws overlay elements
         for button in buttons: button.drawHint()
-
-        
 
         # Handles navigation buttons
         if buttons[0].send: pass
