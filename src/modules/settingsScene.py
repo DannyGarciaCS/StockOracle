@@ -1,5 +1,6 @@
 # Imports
 from src.classes.Button import Button
+from src.classes.Toggle import Toggle
 import pygame as pg
 
 # Initializes settings scene
@@ -35,6 +36,10 @@ def boot(window, settings):
         iconSize=(60, 60))
     ]
 
+    toggles = [
+        Toggle(window, (300, 150), (70, 35), borderRadius=20, margin=5)
+    ]
+
     # Main scene loop
     while True:
 
@@ -58,6 +63,7 @@ def boot(window, settings):
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
         pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 70, 1765, 995), border_radius=10)
         for button in buttons: button.update(position, pressed, released)
+        for toggle in toggles: toggle.update(position, released)
 
         # Draws page title
         window.blit(titleShadow, (155, 20))
