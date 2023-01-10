@@ -12,6 +12,7 @@ class Toggle:
         self.size = size
 
         self.active = False
+        self.hovering = False
 
         # Default visual arguments
         self.visuals = {
@@ -34,11 +35,15 @@ class Toggle:
         self.position[1] < position[1] < self.position[1] + self.size[1]:
 
             pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
+            self.hovering = True
 
             # Defines toggle visuals
             if released == 1: self.active = not self.active
 
-        else:  pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+        elif self.hovering:
+            
+            pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+            self.hovering = False
 
         self.draw()
 
