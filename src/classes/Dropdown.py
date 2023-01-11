@@ -14,7 +14,7 @@ class Dropdown:
 
         self.open = False
         self.hovering = False
-        self.highlighted = 0
+        self.highlighted = -1
 
         # Default visual arguments
         self.visuals = {
@@ -53,7 +53,8 @@ class Dropdown:
                 self.hovering = True
 
                 # Defines highlighted choice
-                selection = int((position[1] - self.position[1]) / self.size[1] - 1)
+                selection = (position[1] - self.position[1]) / self.size[1] - 1
+                selection = int(selection) if selection >= 0 else -1
                 self.highlighted = selection
 
                 # User clicked on available option
@@ -82,6 +83,7 @@ class Dropdown:
         # Dropdown is closed
         else:
 
+            if self.highlighted != -1: self.highlighted = -1
             if self.position[0] < position[0] < self.position[0] + self.size[0] and \
             self.position[1] < position[1] < self.position[1] + self.size[1]:
 

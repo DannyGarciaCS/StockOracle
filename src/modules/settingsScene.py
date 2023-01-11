@@ -2,6 +2,7 @@
 from src.classes.Button import Button
 from src.classes.Toggle import Toggle
 from src.classes.Dropdown import Dropdown
+from src.classes.Slider import Slider
 import pygame as pg
 
 # Initializes settings scene
@@ -45,6 +46,10 @@ def boot(window, settings):
         Dropdown(window, (300, 200), (250, 55), "Default", borderRadius=20)
     ]
 
+    sliders = [
+        Slider(window, (565, 200), (250, 30), 125, trackMargin=8, trackRadius=5, pointerRadius=15)
+    ]
+
     # Main scene loop
     while True:
 
@@ -67,9 +72,11 @@ def boot(window, settings):
         # Draws navigation menu
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
         pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 70, 1765, 995), border_radius=10)
+
         for button in buttons: button.update(position, pressed, released)
         for toggle in toggles: toggle.update(position, released)
         for dropdown in dropdowns: dropdown.update(position, pressed, released)
+        for slider in sliders: slider.update(position, pressed, released)
 
         # Draws page title
         window.blit(titleShadow, (155, 20))
