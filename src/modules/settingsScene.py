@@ -1,8 +1,6 @@
 # Imports
 from src.classes.Button import Button
-from src.classes.Toggle import Toggle
 from src.classes.Dropdown import Dropdown
-from src.classes.Slider import Slider
 import pygame as pg
 
 # Initializes settings scene
@@ -38,16 +36,14 @@ def boot(window, settings):
         iconSize=(60, 60))
     ]
 
-    toggles = [
-        Toggle(window, (300, 150), (70, 35), borderRadius=20, margin=5)
-    ]
+    # Fetches screen settings
+    resolutionsDropdown = buildResolutionsDropdown(window, settings)
+    dropdowns = [resolutionsDropdown]
 
-    dropdowns = [
-        Dropdown(window, (300, 200), (250, 55), "Default", borderRadius=20)
-    ]
-
-    sliders = [
-        Slider(window, (565, 200), (250, 30), 125, trackMargin=8, trackRadius=5, pointerRadius=15)
+    # Displays setting names
+    settingsFont = pg.font.Font("media/latoBold.ttf", 30)
+    settingsText = [
+        (settingsFont.render("Resolution", True, (227, 229, 233)), (185, 108))
     ]
 
     # Main scene loop
@@ -73,10 +69,23 @@ def boot(window, settings):
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
         pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 70, 1765, 995), border_radius=10)
 
+        # Draws custom elements
+        for setting in settingsText: window.blit(*setting)
         for button in buttons: button.update(position, pressed, released)
-        for toggle in toggles: toggle.update(position, released)
         for dropdown in dropdowns: dropdown.update(position, pressed, released)
-        for slider in sliders: slider.update(position, pressed, released)
+
+        if dropdowns[0].changed:
+            
+            # Changes screen resolution
+            value = dropdowns[0].selected.split(" x ")
+            value = list(map(int, value))
+            settings.set("screenX", value[0])
+            settings.set("screenY", value[1])
+            settings.save()
+            window.resize(*value)
+
+            # Updates dropdown
+            dropdowns[0] = buildResolutionsDropdown(window, settings)
 
         # Draws page title
         window.blit(titleShadow, (155, 20))
@@ -95,3 +104,22 @@ def boot(window, settings):
         window.update()
         window.fill((57, 56, 61))
         clock.tick(60)
+
+# Builds the resolution dropdown
+def buildResolutionsDropdown(window, settings):
+
+    # Fetches screen settings
+    screen = [settings.get("screenX"), settings.get("screenY")]
+    display = [settings.get("displayX"), settings.get("displayY")]
+    resolutions = []
+
+    # Fetches valid resolutions
+    for resolution in [[640, 480],[720, 480], [720, 576], [1280, 720],
+    [1920, 1080], [2048, 1080], [2560, 1440], [3840, 2160], [7680, 4320]]:
+
+        if resolution != screen and resolution[0] <= display[0] and resolution[1] <= display[1]:
+            resolutions.append(resolution)
+
+    # Returns built dropdown
+    return Dropdown(window, (365, 100), (250, 55), f"{screen[0]} x {screen[1]}", borderRadius=20,
+    items=[f"{resolution[0]} x {resolution[1]}" for resolution in resolutions])

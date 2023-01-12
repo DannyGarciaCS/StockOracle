@@ -14,6 +14,7 @@ class Dropdown:
 
         self.open = False
         self.hovering = False
+        self.changed = False
         self.highlighted = -1
 
         # Default visual arguments
@@ -41,6 +42,8 @@ class Dropdown:
     # Updates dropdown's status
     def update(self, position, pressed, released):
 
+        if self.changed: self.changed = not self.changed
+
         # Dropdown is open
         if self.open:
 
@@ -66,6 +69,7 @@ class Dropdown:
                         self.selected, self.visuals["items"][selection] = \
                         self.visuals["items"][selection], self.selected
                         self.text, self.renders[selection] = self.renders[selection], self.text
+                        self.changed = True
 
             # We stop hovering
             elif self.hovering:

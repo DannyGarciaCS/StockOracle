@@ -30,9 +30,12 @@ class Window:
     # Resizes resolution shown
     def resize(self, x=-1, y=-1):
 
-        x = x if x > 0 else self.screenX
-        y = y if y > 0 else self.screenY
+        self.screenX = x if x > 0 else self.screenX
+        self.screenY = y if y > 0 else self.screenY
         self.screen = pg.display.set_mode((self.screenX, self.screenY))
+
+        self.aspectX = self.displayX / self.screenX
+        self.aspectY = self.displayY / self.screenY
 
     # Fills window
     def fill(self, color): self.display.fill(color)
