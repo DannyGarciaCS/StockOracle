@@ -85,13 +85,16 @@ def boot(window, settings):
         for setting in settingsText: window.blit(*setting)
         for button in buttons: button.update(position, pressed, released)
         for toggle in toggles: toggle.update(position, released)
-        for dropdown in dropdowns: dropdown.update(position, pressed, released)
+        for dropdown in dropdowns: dropdown.update(position, released)
 
         # Fullscreen change
         if toggles[0].changed:
+
+            # Changes fullscreen status
             settings.set("fullscreen", not settings.get("fullscreen"))
             settings.save()
             window.toggleFullscreen()
+            dropdowns[0].changeLock(settings.get("fullscreen"))
 
         # Resolution change
         if dropdowns[0].changed:
@@ -135,12 +138,12 @@ def buildResolutionsDropdown(window, settings):
     resolutions = []
 
     # Fetches valid resolutions
-    for resolution in [[640, 360], [854, 480], [1280, 720], 
-    [1920, 1080], [2560, 1440], [3840, 2160], [7680, 4320]]:
+    for resolution in [[640, 360], [720, 480], [854, 480], [960, 540], [1280, 720], [1366, 768], [1600, 900],
+    [1920, 1080], [2560, 1440], [3200, 1800], [3840, 2160], [5120, 2880], [7680, 4320]]:
 
         if resolution != screen and resolution[0] <= display[0] and resolution[1] <= display[1]:
             resolutions.append(resolution)
 
     # Returns built dropdown
-    return Dropdown(window, (365, 170), (250, 55), f"{screen[0]} x {screen[1]}", borderRadius=20,
-    items=[f"{resolution[0]} x {resolution[1]}" for resolution in resolutions])
+    return Dropdown(window, (365, 170), (250, 55), f"{screen[0]} x {screen[1]}", settings.get("fullscreen"),
+    borderRadius=20, items=[f"{resolution[0]} x {resolution[1]}" for resolution in resolutions])

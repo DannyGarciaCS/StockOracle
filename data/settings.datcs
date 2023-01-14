@@ -1,6 +1,6 @@
 initialBoot::False
-screenX::1920
-screenY::1080
+screenX::1280
+screenY::720
 displayX::1920
 displayY::1080
 fullscreen::True

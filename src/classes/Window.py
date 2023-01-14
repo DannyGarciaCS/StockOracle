@@ -1,21 +1,23 @@
 # Imports
 import pygame as pg
+import ctypes
 
 # Window class
 class Window:
 
     # Constructor
-    def __init__(self, fullscreen, screenX, screenY, displayX, displayY, title):
+    def __init__(self, settings, title):
 
         pg.init()
         pg.display.set_caption(title)
 
-        self.fullscreen = fullscreen
+        self.settings = settings
+        self.fullscreen = settings.get("fullscreen")
+        self.screenX = settings.get("screenX")
+        self.screenY = settings.get("screenY")
+        self.displayX = settings.get("displayX")
+        self.displayY = settings.get("displayY")
 
-        self.screenX = screenX
-        self.screenY = screenY
-        self.displayX = displayX
-        self.displayY = displayY
         self.aspectX = self.displayX / self.screenX
         self.aspectY = self.displayY / self.screenY
 
@@ -37,10 +39,8 @@ class Window:
     # Resizes resolution shown
     def resize(self, x=-1, y=-1):
 
-        self.screenX = x if x > 0 else self.screenX
-        self.screenY = y if y > 0 else self.screenY
-        self.aspectX = self.displayX / self.screenX
-        self.aspectY = self.displayY / self.screenY
+        self.settings.set("screenX", x if x > 0 else self.settings.get("screenX"))
+        self.settings.set("screenY", y if y > 0 else self.settings.get("screenY"))
         self.updateDisplay()
 
     # Fills window
@@ -54,7 +54,21 @@ class Window:
 
     # Updates used display
     def updateDisplay(self):
-        if self.fullscreen: self.screen = pg.display.set_mode(
-        (self.screenX, self.screenY), pg.FULLSCREEN, pg.HWSURFACE, vsync=1)
-        else: self.screen = pg.display.set_mode((self.screenX, self.screenY))
+
+        if self.fullscreen:
+
+            # Changes resolution to monitor resolution
+            user32 = ctypes.windll.user32
+            self.screenX, self.screenY = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+            self.screen = pg.display.set_mode((self.screenX, self.screenY), pg.FULLSCREEN, pg.HWSURFACE, vsync=1)
+
+        else:
+            
+            # Changes resolution to selection
+            self.screenX, self.screenY = self.settings.get("screenX"), self.settings.get("screenY")
+            self.screen = pg.display.set_mode((self.screenX, self.screenY))
+            
+        # Computes aspect ratio and resets mouse status
+        self.aspectX = self.displayX / self.screenX
+        self.aspectY = self.displayY / self.screenY
         pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)

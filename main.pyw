@@ -13,8 +13,7 @@ def main():
     settings = File("data/settings.datcs")
     if settings.get("initialBoot"): soInit(settings)
 
-    window = Window(settings.get("fullscreen"), settings.get("screenX"), settings.get("screenY"),
-    settings.get("displayX"), settings.get("displayY"), "Market Oracle")
+    window = Window(settings, "Market Oracle")
     scene = "settings"
     running = True
 

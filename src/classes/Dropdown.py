@@ -5,12 +5,13 @@ import pygame as pg
 class Dropdown:
 
     # Constructor
-    def __init__(self, window, position, size, selected, **kwargs):
+    def __init__(self, window, position, size, selected, locked, **kwargs):
 
         self.window = window
         self.position = position
         self.size = size
         self.selected = selected
+        self.locked = locked
 
         self.open = False
         self.hovering = False
@@ -27,6 +28,7 @@ class Dropdown:
             "items": ["Choice 1", "Sample 22", "Choice 333"],
             "textSize": 25,
             "textColor": (227, 229, 233),
+            "lockedColor": (127, 129, 133)
         }
 
         # Replaces all passed visual arguments
@@ -37,70 +39,73 @@ class Dropdown:
         # Text preparation
         self.font = pg.font.Font("media/latoBlack.ttf", self.visuals["textSize"])
         self.text = self.font.render(self.selected, True, self.visuals["textColor"])
+        self.lockedText = self.font.render(self.selected, True, self.visuals["lockedColor"])
         self.renders = [self.font.render(text, True, self.visuals["textColor"]) for text in self.visuals["items"]]
 
     # Updates dropdown's status
-    def update(self, position, pressed, released):
+    def update(self, position, released):
 
-        if self.changed: self.changed = not self.changed
+        # Only update status if dropdown isn't locked
+        if not self.locked:
+            if self.changed: self.changed = not self.changed
 
-        # Dropdown is open
-        if self.open:
+            # Dropdown is open
+            if self.open:
 
-            # User is hovering any of the options
-            if self.position[0] < position[0] < self.position[0] + self.size[0] and \
-            self.position[1] < position[1] < self.position[1] + self.size[1] * (len(self.visuals["items"]) + 1) - \
-            self.visuals["borderWidth"] * (len(self.visuals["items"])):
+                # User is hovering any of the options
+                if self.position[0] < position[0] < self.position[0] + self.size[0] and \
+                self.position[1] < position[1] < self.position[1] + self.size[1] * (len(self.visuals["items"]) + 1) - \
+                self.visuals["borderWidth"] * (len(self.visuals["items"])):
 
-                pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
-                self.hovering = True
+                    pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
+                    self.hovering = True
 
-                # Defines highlighted choice
-                selection = (position[1] - self.position[1]) / self.size[1] - 1
-                selection = int(selection) if selection >= 0 else -1
-                self.highlighted = selection
+                    # Defines highlighted choice
+                    selection = (position[1] - self.position[1]) / self.size[1] - 1
+                    selection = int(selection) if selection >= 0 else -1
+                    self.highlighted = selection
 
-                # User clicked on available option
-                if released == 1:
-                    self.open = not self.open
+                    # User clicked on available option
+                    if released == 1:
+                        self.open = not self.open
 
-                    if not (position[1] - self.position[1]) / self.size[1] < 1:
+                        if not (position[1] - self.position[1]) / self.size[1] < 1:
 
-                        self.selected, self.visuals["items"][selection] = \
-                        self.visuals["items"][selection], self.selected
-                        self.text, self.renders[selection] = self.renders[selection], self.text
-                        self.changed = True
+                            self.selected, self.visuals["items"][selection] = \
+                            self.visuals["items"][selection], self.selected
+                            self.text, self.renders[selection] = self.renders[selection], self.text
+                            self.changed = True
 
-            # We stop hovering
-            elif self.hovering:
+                # We stop hovering
+                elif self.hovering:
+                    
+                    pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+                    self.hovering = False
+
+                    # Handles frame perfect outside click
+                    if released == 1: self.open = not self.open
                 
-                pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
-                self.hovering = False
+                # Clicked outside
+                else:
+                    if released == 1: self.open = not self.open
 
-                 # Handles frame perfect outside click
-                if released == 1: self.open = not self.open
-            
-            # Clicked outside
+            # Dropdown is closed
             else:
-                if released == 1: self.open = not self.open
 
-        # Dropdown is closed
-        else:
+                if self.highlighted != -1: self.highlighted = -1
+                if self.position[0] < position[0] < self.position[0] + self.size[0] and \
+                self.position[1] < position[1] < self.position[1] + self.size[1]:
 
-            if self.highlighted != -1: self.highlighted = -1
-            if self.position[0] < position[0] < self.position[0] + self.size[0] and \
-            self.position[1] < position[1] < self.position[1] + self.size[1]:
+                    pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
+                    self.hovering = True
 
-                pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
-                self.hovering = True
+                    # Defines dropdown visuals
+                    if released == 1: self.open = not self.open
 
-                # Defines dropdown visuals
-                if released == 1: self.open = not self.open
-
-            elif self.hovering:
-                
-                pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
-                self.hovering = False
+                elif self.hovering:
+                    
+                    pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+                    self.hovering = False
 
         self.draw()
 
@@ -163,5 +168,18 @@ class Dropdown:
             pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
 
             textSize = self.font.size(self.selected)
-            self.window.blit(self.text, (self.position[0] + self.size[0] / 2 - textSize[0] / 2,
-            self.position[1] + self.size[1] / 2 - textSize[1] / 2))
+
+            if not self.locked:
+                self.window.blit(self.text, (self.position[0] + self.size[0] / 2 - textSize[0] / 2,
+                self.position[1] + self.size[1] / 2 - textSize[1] / 2))
+            else:
+                self.window.blit(self.lockedText, (self.position[0] + self.size[0] / 2 - textSize[0] / 2,
+                self.position[1] + self.size[1] / 2 - textSize[1] / 2))
+
+    # Locks dropdown lock status
+    def changeLock(self, locked):
+
+        if locked:
+            self.open = False
+            self.locked = True
+        else: self.locked = False
