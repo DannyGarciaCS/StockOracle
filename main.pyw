@@ -2,6 +2,7 @@
 import pygame as pg
 from src.classes.File import File
 from src.classes.Window import Window
+from src.modules.soInit import soInit
 from src.modules.predictionsScene import boot as bootPredictions
 from src.modules.settingsScene import boot as bootSettings
 
@@ -10,7 +11,9 @@ def main():
 
     # Initializes data
     settings = File("data/settings.datcs")
-    window = Window(settings.get("screenX"), settings.get("screenY"),
+    if settings.get("initialBoot"): soInit(settings)
+
+    window = Window(settings.get("fullscreen"), settings.get("screenX"), settings.get("screenY"),
     settings.get("displayX"), settings.get("displayY"), "Market Oracle")
     scene = "settings"
     running = True

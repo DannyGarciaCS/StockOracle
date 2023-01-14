@@ -5,14 +5,15 @@ import pygame as pg
 class Toggle:
 
     # Constructor
-    def __init__(self, window, position, size, **kwargs):
+    def __init__(self, window, position, size, active=False, **kwargs):
 
         self.window = window
         self.position = position
         self.size = size
 
-        self.active = False
+        self.active = active
         self.hovering = False
+        self.changed = False
 
         # Default visual arguments
         self.visuals = {
@@ -31,6 +32,8 @@ class Toggle:
     # Updates toggle's status
     def update(self, position, released):
 
+        self.changed = False
+
         if self.position[0] < position[0] < self.position[0] + self.size[0] and \
         self.position[1] < position[1] < self.position[1] + self.size[1]:
 
@@ -38,7 +41,9 @@ class Toggle:
             self.hovering = True
 
             # Defines toggle visuals
-            if released == 1: self.active = not self.active
+            if released == 1:
+                self.active = not self.active
+                self.changed = True
 
         elif self.hovering:
             

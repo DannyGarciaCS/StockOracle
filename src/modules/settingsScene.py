@@ -1,5 +1,6 @@
 # Imports
 from src.classes.Button import Button
+from src.classes.Toggle import Toggle
 from src.classes.Dropdown import Dropdown
 import pygame as pg
 
@@ -30,10 +31,19 @@ def boot(window, settings):
         hintParameters = (window, (15, 360), "Predictions dashboard", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
+        Button(window, (15, 860), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
+        iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
+        hintParameters = (window, (15, 770), "Change settings", "D", 34), drawHint = True,
+        iconSize=(60, 60)),
+
         Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
         iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
-        hintParameters = (window, (15, 880), "Change settings", "D", 34), drawHint = True,
+        hintParameters = (window, (15, 880), "Quit Stock Oracle", "D", 34), drawHint = True,
         iconSize=(60, 60))
+    ]
+
+    toggles = [
+        Toggle(window, (365, 110), (70, 35), settings.get("fullscreen"), borderRadius=20, margin=5)
     ]
 
     # Fetches screen settings
@@ -43,7 +53,9 @@ def boot(window, settings):
     # Displays setting names
     settingsFont = pg.font.Font("media/latoBold.ttf", 30)
     settingsText = [
-        (settingsFont.render("Resolution", True, (227, 229, 233)), (185, 108))
+        (settingsFont.render("Fullscreen", True, (227, 229, 233)), (185, 108)),
+        (settingsFont.render("Resolution", True, (227, 229, 233)), (185, 178))
+        
     ]
 
     # Main scene loop
@@ -72,8 +84,16 @@ def boot(window, settings):
         # Draws custom elements
         for setting in settingsText: window.blit(*setting)
         for button in buttons: button.update(position, pressed, released)
+        for toggle in toggles: toggle.update(position, released)
         for dropdown in dropdowns: dropdown.update(position, pressed, released)
 
+        # Fullscreen change
+        if toggles[0].changed:
+            settings.set("fullscreen", not settings.get("fullscreen"))
+            settings.save()
+            window.toggleFullscreen()
+
+        # Resolution change
         if dropdowns[0].changed:
             
             # Changes screen resolution
@@ -99,6 +119,7 @@ def boot(window, settings):
         if buttons[1].send: pass
         if buttons[2].send: return True, "predictions"
         if buttons[3].send: return True, "settings"
+        if buttons[4].send: return False, "NA"
 
         # Updates window
         window.update()
@@ -114,12 +135,12 @@ def buildResolutionsDropdown(window, settings):
     resolutions = []
 
     # Fetches valid resolutions
-    for resolution in [[640, 480],[720, 480], [720, 576], [1280, 720],
-    [1920, 1080], [2048, 1080], [2560, 1440], [3840, 2160], [7680, 4320]]:
+    for resolution in [[640, 360], [854, 480], [1280, 720], 
+    [1920, 1080], [2560, 1440], [3840, 2160], [7680, 4320]]:
 
         if resolution != screen and resolution[0] <= display[0] and resolution[1] <= display[1]:
             resolutions.append(resolution)
 
     # Returns built dropdown
-    return Dropdown(window, (365, 100), (250, 55), f"{screen[0]} x {screen[1]}", borderRadius=20,
+    return Dropdown(window, (365, 170), (250, 55), f"{screen[0]} x {screen[1]}", borderRadius=20,
     items=[f"{resolution[0]} x {resolution[1]}" for resolution in resolutions])

@@ -25,9 +25,14 @@ def boot(window, settings):
         hintParameters = (window, (15, 360), "Predictions dashboard", "U", 34), drawHint = True,
         iconSize=(60, 60)),
 
+        Button(window, (15, 860), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
+        iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
+        hintParameters = (window, (15, 770), "Change settings", "D", 34), drawHint = True,
+        iconSize=(60, 60)),
+
         Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
         iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
-        hintParameters = (window, (15, 880), "Change settings", "D", 34), drawHint = True,
+        hintParameters = (window, (15, 880), "Quit Stock Oracle", "D", 34), drawHint = True,
         iconSize=(60, 60))
     ]
 
@@ -66,6 +71,7 @@ def boot(window, settings):
         if buttons[1].send: pass
         if buttons[2].send: return True, "predictions"
         if buttons[3].send: return True, "settings"
+        if buttons[4].send: return False, "NA"
 
         # Updates window
         window.update()
