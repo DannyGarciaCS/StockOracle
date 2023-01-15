@@ -36,8 +36,8 @@ def boot(window, settings):
         hintParameters = (window, (15, 770), "Change settings", "D", 34), drawHint = True,
         iconSize=(60, 60)),
 
-        Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
-        iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
+        Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/exitIconBase.png",
+        iconHighlight="media/exitIconHighlight.png", iconClick="media/exitIconClick.png",
         hintParameters = (window, (15, 880), "Quit Stock Oracle", "D", 34), drawHint = True,
         iconSize=(60, 60))
     ]
