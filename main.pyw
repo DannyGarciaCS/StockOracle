@@ -12,7 +12,6 @@ def main():
     # Initializes data
     settings = File("data/settings.datcs")
     if settings.get("initialBoot"): soInit(settings)
-
     window = Window(settings, "Market Oracle")
     scene = "predictions"
     running = True

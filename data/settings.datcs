@@ -1,4 +1,4 @@
-initialBoot::False
+initialBoot::True
 fullscreen::False
 menuScale::1.0
 screenX::1600
@@ -9,8 +9,9 @@ CRmenuXL::(80, 80, 80)
 CRmenuL::(55, 55, 55)
 CRmenuD::(40, 40, 40)
 CRmenuXD::(30, 30, 30)
-CRshapeL::(135, 135, 135)
-CRshapeD::(245, 245, 245)
+CRstrokeL::(245, 245, 245)
+CRstrokeD::(135, 135, 135)
 CRhighlight::(35, 135, 230)
 CRgood::()
 CRbad::()
+TXTread::20

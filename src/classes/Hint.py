@@ -5,24 +5,26 @@ import pygame as pg
 class Hint:
 
     # Constructor
-    def __init__(self, window, position, text, pointerDirection="U", pointerMargin=16):
+    def __init__(self, window, settings, position, text, pointerDirection="-", pointerMargin=0):
 
+        # Passed arguments
         self.window = window
+        self.settings = settings
         self.position = position
         self.pointerDirection = pointerDirection
         self.pointerMargin = pointerMargin
 
-        self.color = (50, 50, 52)
-        self.fontColor = (227, 229, 233)
-        self.fontSize = 22
-        self.margin = 15
-        self.borderRadius = 8
-        self.pointerSize = 26
-        self.borderSize = 1
+        # Implied arguments
+        self.color = settings.get("CRmenuXD")
+        self.margin = 12 * settings.get("menuScale")
+        self.borderRadius = round(8 * settings.get("menuScale"))
+        self.borderSize = round(2 * settings.get("menuScale"))
+        self.pointerSize = 20 * settings.get("menuScale")
         self.show = False
 
-        self.font = pg.font.Font("media/latoBlack.ttf", self.fontSize)
-        self.text = self.font.render(text, True, self.fontColor)
+        # Text
+        self.font = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTread") * settings.get("menuScale")))
+        self.text = self.font.render(text, True, settings.get("CRstrokeL"))
         self.size = list(self.font.size(text))
         self.size[0] += self.margin * 2
         self.size[1] += self.margin * 2

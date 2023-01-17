@@ -1,52 +1,20 @@
 # Imports
-from src.classes.Button import Button
 import pygame as pg
 from sys import exit
+from src.classes.Button import Button
 
 # Initializes predictions scene
 def boot(window, settings):
 
     # Scene variables
     clock = pg.time.Clock()
-
-    buttons = [
-        Button(window, (15, 15), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/screenerIconBase.png",
-        iconHighlight="media/screenerIconHighlight.png", iconClick="media/screenerIconClick.png",
-        hintParameters = (window, (15, 140), "Stock screener (Not Implemented Yet)", "U", 34), drawHint = True,
-        iconSize=(60, 60)),
-
-        Button(window, (15, 125), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/rulesIconBase.png",
-        iconHighlight="media/rulesIconHighlight.png", iconClick="media/rulesIconClick.png",
-        hintParameters = (window, (15, 250), "Rules editor (Not Implemented Yet)", "U", 34), drawHint = True,
-        iconSize=(60, 60)),
-
-        Button(window, (15, 235), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/predictionsIconBase.png",
-        iconHighlight="media/predictionsIconHighlight.png", iconClick="media/predictionsIconClick.png",
-        hintParameters = (window, (15, 360), "Predictions dashboard", "U", 34), drawHint = True,
-        iconSize=(60, 60)),
-
-        Button(window, (15, 860), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/settingsIconBase.png",
-        iconHighlight="media/settingsIconHighlight.png", iconClick="media/settingsIconClick.png",
-        hintParameters = (window, (15, 770), "Change settings", "D", 34), drawHint = True,
-        iconSize=(60, 60)),
-
-        Button(window, (15, 970), (95, 95), borderRadius=10, drawIcon=True, iconBase="media/exitIconBase.png",
-        iconHighlight="media/exitIconHighlight.png", iconClick="media/exitIconClick.png",
-        hintParameters = (window, (15, 880), "Quit Stock Oracle", "D", 34), drawHint = True,
-        iconSize=(60, 60))
-    ]
+    ui = generateUI(window, settings)
 
     # Main scene loop
     while True:
 
-        # Mouse
-        position = list(pg.mouse.get_pos())
-        position[0] = position[0] * window.aspectX
-        position[1] = position[1] * window.aspectY
-        pressed = pg.mouse.get_pressed()
-        released = 0
-
         # Event handling
+        position, pressed, released = getMouse(window)
         for event in pg.event.get():
 
             # Cross is pressed
@@ -55,25 +23,74 @@ def boot(window, settings):
             # Mouse button is released
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
-        # Draws navigation menu
-        pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
-        for button in buttons: button.update(position, pressed, released)
-
-        pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
-        pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
-        pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
-
-        # Draws overlay elements
-        for button in buttons: button.drawHint()
-
-        # Handles navigation buttons
-        if buttons[0].send: pass
-        if buttons[1].send: pass
-        if buttons[2].send: return True, "predictions"
-        if buttons[3].send: return True, "settings"
-        if buttons[4].send: return False, "NA"
-
         # Updates window
+        handleUI(window, settings, ui, position, pressed, released)
         window.update()
-        window.fill((57, 56, 61))
+        window.fill(settings.get("CRmenuD"))
         clock.tick(60)
+
+# Refreshes mouse information
+def getMouse(window):
+
+    # Mouse position
+    position = list(pg.mouse.get_pos())
+    position[0] = position[0] * window.aspectX
+    position[1] = position[1] * window.aspectY
+
+    # Mouse interactivity
+    pressed = pg.mouse.get_pressed()
+    released = 0
+
+    return position, pressed, released
+
+# Generates ui elements
+def generateUI(window, settings, buttons=True):
+
+    ui = {}
+
+    # Generates batch of buttons
+    if buttons:
+        ui["buttons"] = [
+            Button(window, (5 * settings.get("menuScale"), 5 * settings.get("menuScale")),
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), drawIcon=True, drawBackground=False,
+            iconBase="media/screenerIconBase.png",
+            iconHighlight="media/screenerIconHighlight.png",
+            iconClick="media/screenerIconClick.png",
+            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
+            hintParameters = (window, settings, (20 * settings.get("menuScale"), 110 * settings.get("menuScale")),
+            "Stock screener (Not Implemented Yet)", "U", 20 * settings.get("menuScale"))),
+
+            Button(window, (5 * settings.get("menuScale"), 105 * settings.get("menuScale")),
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), drawIcon=True, drawBackground=False,
+            iconBase="media/rulesIconBase.png",
+            iconHighlight="media/rulesIconHighlight.png",
+            iconClick="media/rulesIconClick.png",
+            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
+            hintParameters = (window, settings, (20 * settings.get("menuScale"), 210 * settings.get("menuScale")),
+            "Rules editor (Not Implemented Yet)", "U", 20 * settings.get("menuScale"))),
+
+            Button(window, (5 * settings.get("menuScale"), 205 * settings.get("menuScale")),
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), drawIcon=True, drawBackground=False,
+            iconBase="media/predictionsIconBase.png",
+            iconHighlight="media/predictionsIconHighlight.png",
+            iconClick="media/predictionsIconClick.png",
+            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
+            hintParameters = (window, settings, (20 * settings.get("menuScale"), 310 * settings.get("menuScale")),
+            "Predictions dashboard", "U", 20 * settings.get("menuScale")))
+        ]
+
+    return ui
+
+def handleUI(window, settings, ui, position, pressed, released):
+
+    # Draws navigation menu
+    pg.draw.rect(window.display, settings.get("CRmenuL"), pg.Rect(0, 0, 100 * settings.get("menuScale"), 1080))
+    pg.draw.rect(window.display, settings.get("CRstrokeL"), pg.Rect(94 * settings.get("menuScale"),
+    210 * settings.get("menuScale"), 6 * settings.get("menuScale"), 80 * settings.get("menuScale")))
+
+    # pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
+    # pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
+    # pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
+
+    for button in ui["buttons"]: button.update(position, pressed, released)
+    for button in ui["buttons"]: button.drawHint()

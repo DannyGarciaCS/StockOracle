@@ -20,6 +20,7 @@ class Button:
             "colorBase": (50, 50, 52),
             "colorHighlight": (69, 70, 72),
             "colorClick": (45, 45, 47),
+            "drawBackground": True,
             "drawBorder": False,
             "borderWidth": 1,
             "borderColor": (0, 0, 0),
@@ -93,20 +94,21 @@ class Button:
     def draw(self):
 
         # Draws body of button
-        if self.status == "base":
-            pg.draw.rect(self.window.display, self.visuals["colorBase"],
-            pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
-        elif self.status == "highlight":
-            pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
-            pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
-        elif self.status == "click":
-            pg.draw.rect(self.window.display, self.visuals["colorClick"],
-            pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
+        if self.visuals["drawBackground"]:
+            if self.status == "base":
+                pg.draw.rect(self.window.display, self.visuals["colorBase"],
+                pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
+            elif self.status == "highlight":
+                pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
+                pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
+            elif self.status == "click":
+                pg.draw.rect(self.window.display, self.visuals["colorClick"],
+                pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
 
-        # Draws border
-        if self.visuals["drawBorder"]:
-            pg.draw.rect(self.window.display, self.visuals["borderColor"], pg.Rect(
-            *self.position, *self.size), border_radius=self.visuals["borderRadius"], width=self.visuals["borderWidth"])
+            # Draws border
+            if self.visuals["drawBorder"]:
+                pg.draw.rect(self.window.display, self.visuals["borderColor"], pg.Rect(
+                *self.position, *self.size), border_radius=self.visuals["borderRadius"], width=self.visuals["borderWidth"])
 
         # Draws icon
         if self.visuals["drawIcon"]:

@@ -1,6 +1,6 @@
 
 # Build settings
-initialBoot::False
+initialBoot::True           ######
 menuScale::1.0
 
 # Screen settings
@@ -16,9 +16,9 @@ CRmenuL::(55, 55, 55)
 CRmenuD::(40, 40, 40)
 CRmenuXD::(30, 30, 30)
 
-# Icon colors
-CRshapeL::(135, 135, 135)
-CRshapeD::(245, 245, 245)
+# Stroke colors
+CRstrokeL::(245, 245, 245)
+CRstrokeD::(135, 135, 135)
 
 # Highlight colors
 CRhighlight::(35,135,230)
@@ -26,3 +26,4 @@ CRgood::()
 CRbad::()
 
 # Text size settings
+TXTread::20
