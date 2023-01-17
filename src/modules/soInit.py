@@ -1,4 +1,5 @@
 # Imports
+from src.classes.File import File
 import pygame as pg
 import ctypes
 
@@ -17,11 +18,14 @@ def soInit(settings):
             setResolution = resolution
         else: break
     
-    # Sets default settings
+    # Resets settings to the originals
+    originalSettings = File("data/annotatedSettings.datcs")
+    for key in originalSettings.data:
+        settings.set(key, originalSettings.data[key])
+
+    print(setResolution)
+    
+    # Sets fetched resolution and saves
     settings.set("screenX", setResolution[0])
     settings.set("screenY", setResolution[1])
-    settings.set("displayX", 1920)
-    settings.set("displayY", 1080)
-    settings.set("fullscreen", False)
-    settings.set("initialBoot", False)
     settings.save()

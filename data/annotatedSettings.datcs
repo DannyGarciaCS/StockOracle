@@ -1,16 +1,28 @@
+
+# Build settings
 initialBoot::False
-fullscreen::False
 menuScale::1.0
-screenX::1600
-screenY::900
+
+# Screen settings
+fullscreen::False
+screenX::1280
+screenY::720
 displayX::1920
 displayY::1080
+
+# Menu colors
 CRmenuXL::(80, 80, 80)
 CRmenuL::(55, 55, 55)
 CRmenuD::(40, 40, 40)
 CRmenuXD::(30, 30, 30)
+
+# Icon colors
 CRshapeL::(135, 135, 135)
 CRshapeD::(245, 245, 245)
-CRhighlight::(35, 135, 230)
+
+# Highlight colors
+CRhighlight::(35,135,230)
 CRgood::()
 CRbad::()
+
+# Text size settings
