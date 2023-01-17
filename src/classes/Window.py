@@ -46,6 +46,12 @@ class Window:
     # Fills window
     def fill(self, color): self.display.fill(color)
 
+    # Fills window with transparent color
+    def fillTransparent(self, color):
+        surface = pg.Surface((1920, 1080)).convert_alpha()
+        surface.fill(color)
+        self.blit(surface, (0, 0))
+
     # Draws on window
     def blit(self, surface, position): self.display.blit(surface, position)
 

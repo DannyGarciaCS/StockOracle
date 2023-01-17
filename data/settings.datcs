@@ -3,4 +3,4 @@ screenX::1280
 screenY::720
 displayX::1920
 displayY::1080
-fullscreen::True
+fullscreen::False

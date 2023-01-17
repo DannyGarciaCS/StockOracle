@@ -14,7 +14,7 @@ def main():
     if settings.get("initialBoot"): soInit(settings)
 
     window = Window(settings, "Market Oracle")
-    scene = "settings"
+    scene = "predictions"
     running = True
 
     # Main program loop

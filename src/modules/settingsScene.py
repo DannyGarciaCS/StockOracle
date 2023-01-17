@@ -10,8 +10,11 @@ def boot(window, settings):
     # Scene variables
     clock = pg.time.Clock()
 
-    # Page title
+    # Text elements
     titleFont = pg.font.Font("media/latoBold.ttf", 35)
+    warningFont = pg.font.Font("media/latoBold.ttf", 25)
+    warningIcon = pg.image.load("media/warningIcon.png").convert_alpha()
+    warningIcon = pg.transform.scale(warningIcon, (40, 40))
     title = titleFont.render("SETTINGS", True, (227, 229, 233))
     titleShadow = titleFont.render("SETTINGS", True, (45, 45, 47))
 
@@ -55,7 +58,6 @@ def boot(window, settings):
     settingsText = [
         (settingsFont.render("Fullscreen", True, (227, 229, 233)), (185, 108)),
         (settingsFont.render("Resolution", True, (227, 229, 233)), (185, 178))
-        
     ]
 
     # Main scene loop
@@ -80,6 +82,7 @@ def boot(window, settings):
         # Draws navigation menu
         pg.draw.rect(window.display, (40, 39, 43), pg.Rect(0, 0, 125, 1080))
         pg.draw.rect(window.display, (45, 45, 47), pg.Rect(140, 70, 1765, 995), border_radius=10)
+
 
         # Draws custom elements
         for setting in settingsText: window.blit(*setting)
@@ -113,6 +116,12 @@ def boot(window, settings):
         # Draws page title
         window.blit(titleShadow, (155, 20))
         window.blit(title, (155, 15))
+
+        # Setting warnings
+        if settings.get("fullscreen"):
+            window.blit(warningIcon, (630, 178))
+            window.blit(warningFont.render("Resolution can't be changed on fullscreen mode",
+            True, (215, 35, 35)), (680, 183))
 
         # Draws overlay elements
         for button in buttons: button.drawHint()
