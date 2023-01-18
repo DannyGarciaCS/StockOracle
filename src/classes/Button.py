@@ -6,14 +6,16 @@ import pygame as pg
 class Button:
 
     # Constructor
-    def __init__(self, window, position, size, **kwargs):
+    def __init__(self, window, position, size, lock="NA", **kwargs):
 
         self.window = window
         self.position = position
         self.size = size
+        self.lock = lock
 
         self.status = "base"
         self.send = False
+        self.hovering = False
 
         # Default visual arguments
         self.visuals = {
@@ -74,6 +76,7 @@ class Button:
             # Defines button visuals
             if pressed[0]: self.status = "click"
             else: self.status = "highlight"
+            self.hovering = True
 
             # Executes button signal if button released
             if released == 1: self.send = True
@@ -81,12 +84,21 @@ class Button:
 
             if self.visuals["drawHint"]: self.hint.show = True
 
-        elif self.status in ["click", "highlight"]:
+        elif self.hovering:
 
             pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+            self.hovering = False
             
             self.status = "base"
             if self.visuals["drawHint"]: self.hint.show = False
+
+        if self.lock == "active":
+            self.status = "highlight"
+            self.send = False
+
+        elif self.lock == "inactive":
+            self.status = "base"
+            self.send = False
 
         self.draw()
 

@@ -52,7 +52,8 @@ def generateUI(window, settings, buttons=True):
     if buttons:
         ui["buttons"] = [
             Button(window, (5 * settings.get("menuScale"), 5 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), drawIcon=True, drawBackground=False,
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
+            drawIcon=True, drawBackground=False,
             iconBase="media/screenerIconBase.png",
             iconHighlight="media/screenerIconHighlight.png",
             iconClick="media/screenerIconClick.png",
@@ -61,7 +62,8 @@ def generateUI(window, settings, buttons=True):
             "Stock screener (Not Implemented Yet)", "U", 20 * settings.get("menuScale"))),
 
             Button(window, (5 * settings.get("menuScale"), 105 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), drawIcon=True, drawBackground=False,
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
+            drawIcon=True, drawBackground=False,
             iconBase="media/rulesIconBase.png",
             iconHighlight="media/rulesIconHighlight.png",
             iconClick="media/rulesIconClick.png",
@@ -70,13 +72,35 @@ def generateUI(window, settings, buttons=True):
             "Rules editor (Not Implemented Yet)", "U", 20 * settings.get("menuScale"))),
 
             Button(window, (5 * settings.get("menuScale"), 205 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), drawIcon=True, drawBackground=False,
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), "active",
+            drawIcon=True, drawBackground=False,
             iconBase="media/predictionsIconBase.png",
             iconHighlight="media/predictionsIconHighlight.png",
             iconClick="media/predictionsIconClick.png",
             iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
             hintParameters = (window, settings, (20 * settings.get("menuScale"), 310 * settings.get("menuScale")),
-            "Predictions dashboard", "U", 20 * settings.get("menuScale")))
+            "Predictions dashboard", "U", 20 * settings.get("menuScale"))),
+
+            Button(window, (5 * settings.get("menuScale"), 1080 - 195 * settings.get("menuScale")),
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
+            drawIcon=True, drawBackground=False,
+            iconBase="media/settingsIconBase.png",
+            iconHighlight="media/settingsIconHighlight.png",
+            iconClick="media/settingsIconClick.png",
+            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
+            hintParameters = (window, settings, (20 * settings.get("menuScale"), 1080 - 260 * settings.get("menuScale")),
+            "Change settings", "D", 20 * settings.get("menuScale"))),
+
+
+            Button(window, (5 * settings.get("menuScale"), 1080 - 95 * settings.get("menuScale")),
+            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
+            drawIcon=True, drawBackground=False,
+            iconBase="media/exitIconBase.png",
+            iconHighlight="media/exitIconHighlight.png",
+            iconClick="media/exitIconClick.png",
+            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
+            hintParameters = (window, settings, (20 * settings.get("menuScale"), 1080 - 160 * settings.get("menuScale")),
+            "Quit Stock Oracle", "D", 20 * settings.get("menuScale")))
         ]
 
     return ui
