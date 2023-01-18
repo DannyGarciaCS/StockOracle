@@ -24,7 +24,8 @@ def boot(window, settings):
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
         # Updates window
-        handleUI(window, settings, ui, position, pressed, released)
+        response = handleUI(window, settings, ui, position, pressed, released)
+        if response != 1: return response
         window.update()
         window.fill(settings.get("CRmenuD"))
         clock.tick(60)
@@ -44,7 +45,7 @@ def getMouse(window):
     return position, pressed, released
 
 # Generates ui elements
-def generateUI(window, settings, buttons=True):
+def generateUI(window, settings, buttons=True, text=True):
 
     ui = {}
 
@@ -88,8 +89,8 @@ def generateUI(window, settings, buttons=True):
             iconHighlight="media/settingsIconHighlight.png",
             iconClick="media/settingsIconClick.png",
             iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"), 1080 - 260 * settings.get("menuScale")),
-            "Change settings", "D", 20 * settings.get("menuScale"))),
+            hintParameters = (window, settings, (20 * settings.get("menuScale"),
+            1080 - 260 * settings.get("menuScale")), "Change settings", "D", 20 * settings.get("menuScale"))),
 
 
             Button(window, (5 * settings.get("menuScale"), 1080 - 95 * settings.get("menuScale")),
@@ -99,8 +100,15 @@ def generateUI(window, settings, buttons=True):
             iconHighlight="media/exitIconHighlight.png",
             iconClick="media/exitIconClick.png",
             iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"), 1080 - 160 * settings.get("menuScale")),
-            "Quit Stock Oracle", "D", 20 * settings.get("menuScale")))
+            hintParameters = (window, settings, (20 * settings.get("menuScale"),
+            1080 - 160 * settings.get("menuScale")), "Quit Stock Oracle", "D", 20 * settings.get("menuScale")))
+        ]
+    
+    if text:
+        settingsFont = pg.font.Font("media/latoBold.ttf", 30)
+        ui["text"] = [
+            (settingsFont.render("Fullscreen", True, (227, 229, 233)), (185, 108)),
+            (settingsFont.render("Resolution", True, (227, 229, 233)), (185, 178))
         ]
 
     return ui
@@ -118,3 +126,11 @@ def handleUI(window, settings, ui, position, pressed, released):
 
     for button in ui["buttons"]: button.update(position, pressed, released)
     for button in ui["buttons"]: button.drawHint()
+
+    # Handles navigation buttons
+    if ui["buttons"][0].send: pass
+    if ui["buttons"][1].send: pass
+    if ui["buttons"][3].send: return True, "settings"
+    if ui["buttons"][4].send: return False, "NA"
+
+    return 1

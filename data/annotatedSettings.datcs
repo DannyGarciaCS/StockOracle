@@ -23,7 +23,7 @@ CRstrokeD::(135, 135, 135)
 # Highlight colors
 CRhighlight::(35,135,230)
 CRgood::()
-CRbad::()
+CRbad::(215, 35, 35)
 
 # Text size settings
-TXTread::20
+TXTread::22

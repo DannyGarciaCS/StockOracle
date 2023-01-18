@@ -1,6 +1,6 @@
 initialBoot::True
 fullscreen::False
-menuScale::1.0
+menuScale::1.5
 screenX::1600
 screenY::900
 displayX::1920
@@ -13,5 +13,5 @@ CRstrokeL::(245, 245, 245)
 CRstrokeD::(135, 135, 135)
 CRhighlight::(35, 135, 230)
 CRgood::()
-CRbad::()
-TXTread::20
+CRbad::(215, 35, 35)
+TXTread::22

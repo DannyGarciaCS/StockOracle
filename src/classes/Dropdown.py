@@ -7,12 +7,14 @@ class Dropdown:
     # Constructor
     def __init__(self, window, position, size, selected, locked, **kwargs):
 
+        # Passed arguments
         self.window = window
         self.position = position
         self.size = size
         self.selected = selected
         self.locked = locked
 
+        # Implied arguments
         self.open = False
         self.hovering = False
         self.changed = False
@@ -22,6 +24,7 @@ class Dropdown:
         self.visuals = {
             "colorBase": (67, 66, 71),
             "colorHighlight": (89, 90, 92),
+            "drawBorder": True,
             "borderRadius": 0,
             "borderWidth": 3,
 
@@ -61,7 +64,7 @@ class Dropdown:
                     self.hovering = True
 
                     # Defines highlighted choice
-                    selection = (position[1] - self.position[1]) / self.size[1] - 1
+                    selection = (position[1] - self.position[1]) / (self.size[1] - self.visuals["borderWidth"]) - 1
                     selection = int(selection) if selection >= 0 else -1
                     self.highlighted = selection
 
@@ -126,10 +129,11 @@ class Dropdown:
             self.position[1] + self.size[1] / 2 - textSize[1] / 2))
 
             # Main selection border
-            pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
-            pg.Rect(*self.position, *self.size), self.visuals["borderWidth"],
-            border_top_left_radius=self.visuals["borderRadius"],
-            border_top_right_radius=self.visuals["borderRadius"])
+            if self.visuals["drawBorder"]:
+                pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
+                pg.Rect(*self.position, *self.size), self.visuals["borderWidth"],
+                border_top_left_radius=self.visuals["borderRadius"],
+                border_top_right_radius=self.visuals["borderRadius"])
 
             # Renders all choices
             for i, render in enumerate(self.renders):
@@ -140,21 +144,29 @@ class Dropdown:
 
                 # Choice is last choice
                 if i != len(self.renders) - 1:
+
+                    # Draws body
                     pg.draw.rect(self.window.display, color,
                     pg.Rect(self.position[0], self.position[1] + offset, *self.size))
 
-                    pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
-                    pg.Rect(self.position[0], self.position[1] + offset, *self.size), self.visuals["borderWidth"])
+                    # Draws border
+                    if self.visuals["drawBorder"]:
+                        pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
+                        pg.Rect(self.position[0], self.position[1] + offset, *self.size), self.visuals["borderWidth"])
                 else:
+
+                    # Draws body
                     pg.draw.rect(self.window.display, color,
                     pg.Rect(self.position[0], self.position[1] + offset, *self.size),
                     border_bottom_left_radius=self.visuals["borderRadius"],
                     border_bottom_right_radius=self.visuals["borderRadius"])
 
-                    pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
-                    pg.Rect(self.position[0], self.position[1] + offset, *self.size), self.visuals["borderWidth"],
-                    border_bottom_left_radius=self.visuals["borderRadius"],
-                    border_bottom_right_radius=self.visuals["borderRadius"])
+                    # Draws border
+                    if self.visuals["drawBorder"]:
+                        pg.draw.rect(self.window.display, self.visuals["colorHighlight"],
+                        pg.Rect(self.position[0], self.position[1] + offset, *self.size), self.visuals["borderWidth"],
+                        border_bottom_left_radius=self.visuals["borderRadius"],
+                        border_bottom_right_radius=self.visuals["borderRadius"])
 
                 # Draws centered choice text
                 textSize = self.font.size(self.visuals["items"][i])

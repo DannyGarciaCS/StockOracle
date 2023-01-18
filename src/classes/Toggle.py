@@ -7,10 +7,12 @@ class Toggle:
     # Constructor
     def __init__(self, window, position, size, active=False, **kwargs):
 
+        # Passed arguments
         self.window = window
         self.position = position
         self.size = size
 
+        # Implied arguments
         self.active = active
         self.hovering = False
         self.changed = False
@@ -34,6 +36,7 @@ class Toggle:
 
         self.changed = False
 
+        # Toggle is hovered
         if self.position[0] < position[0] < self.position[0] + self.size[0] and \
         self.position[1] < position[1] < self.position[1] + self.size[1]:
 
@@ -45,6 +48,7 @@ class Toggle:
                 self.active = not self.active
                 self.changed = True
 
+        # Toggle is not being hovered
         elif self.hovering:
             
             pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)

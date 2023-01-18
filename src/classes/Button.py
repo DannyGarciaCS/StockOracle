@@ -8,11 +8,13 @@ class Button:
     # Constructor
     def __init__(self, window, position, size, lock="NA", **kwargs):
 
+        # Passed arguments
         self.window = window
         self.position = position
         self.size = size
         self.lock = lock
 
+        # Implied arguments
         self.status = "base"
         self.send = False
         self.hovering = False
@@ -68,34 +70,38 @@ class Button:
     # Updates button's status
     def update(self, position, pressed, released):
 
+        # Button is being hovered
         if self.position[0] < position[0] < self.position[0] + self.size[0] and \
         self.position[1] < position[1] < self.position[1] + self.size[1]:
 
             pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
+            self.hovering = True
 
             # Defines button visuals
             if pressed[0]: self.status = "click"
             else: self.status = "highlight"
-            self.hovering = True
 
             # Executes button signal if button released
             if released == 1: self.send = True
             else: self.send = False
-
             if self.visuals["drawHint"]: self.hint.show = True
 
+        # User stopped hovering
         elif self.hovering:
 
             pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
             self.hovering = False
             
+            # Defines button visuals
             self.status = "base"
             if self.visuals["drawHint"]: self.hint.show = False
 
+        # Button is in permanent active state
         if self.lock == "active":
             self.status = "highlight"
             self.send = False
 
+        # Button is in permanent inactive state
         elif self.lock == "inactive":
             self.status = "base"
             self.send = False
@@ -120,7 +126,8 @@ class Button:
             # Draws border
             if self.visuals["drawBorder"]:
                 pg.draw.rect(self.window.display, self.visuals["borderColor"], pg.Rect(
-                *self.position, *self.size), border_radius=self.visuals["borderRadius"], width=self.visuals["borderWidth"])
+                *self.position, *self.size), border_radius=self.visuals["borderRadius"],
+                width=self.visuals["borderWidth"])
 
         # Draws icon
         if self.visuals["drawIcon"]:
