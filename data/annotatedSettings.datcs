@@ -21,7 +21,8 @@ CRstrokeL::(245, 245, 245)
 CRstrokeD::(135, 135, 135)
 
 # Highlight colors
-CRhighlight::(35,135,230)
+CRhighlightL::(35,135,230)
+CRhighlightD::(40,85,235)
 CRgood::()
 CRbad::(215, 35, 35)
 

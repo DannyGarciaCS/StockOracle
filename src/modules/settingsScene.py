@@ -3,6 +3,7 @@ import pygame as pg
 from sys import exit
 from src.classes.Button import Button
 from src.classes.Toggle import Toggle
+from src.classes.Slider import Slider
 from src.classes.Dropdown import Dropdown
 
 # Initializes predictions scene
@@ -27,7 +28,8 @@ def boot(window, settings):
 
         # Updates window
         response = handleUI(window, settings, ui, position, pressed, released)
-        if response != 1: return response
+        if type(response) != type({}): return response
+        ui = response
         window.update()
         window.fill(settings.get("CRmenuD"))
         clock.tick(60)
@@ -47,7 +49,7 @@ def getMouse(window):
     return position, pressed, released
 
 # Generates ui elements
-def generateUI(window, settings, buttons=True, toggles=True, dropdowns=True, text=True, misc=True):
+def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropdowns=True, text=True, misc=True):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -96,11 +98,22 @@ def generateUI(window, settings, buttons=True, toggles=True, dropdowns=True, tex
     # Generates batch of toggles
     if toggles:
         ui["toggles"] = [
-            Toggle(window, (330 * ms, 108 * ms), (55 * ms, 28 * ms), settings.get("fullscreen"),
+            Toggle(window, (330 * ms, 178 * ms), (55 * ms, 28 * ms), settings.get("fullscreen"),
             borderRadius=round(20 * ms), margin=5 * ms, colorBase=settings.get("CRmenuL"),
-            colorActive=settings.get("CRhighlight"), colorHighlight=settings.get("CRmenuXL"))
+            colorActive=settings.get("CRhighlightL"), colorHighlight=settings.get("CRmenuXL"))
         ]
     
+    if sliders:
+
+        width = 185 * ms
+        ui["sliders"] = [
+            Slider(window, (330 * ms, 100 * ms), (width, 45 * ms),
+            initialFill = width * ((settings.get("menuScale") - 0.65) / 0.7),
+            colorBase=settings.get("CRmenuL"), colorPointer=settings.get("CRhighlightL"),
+            colorShadow=settings.get("CRhighlightD"), trackMargin = 17 * ms, trackRadius = round(8 * ms),
+            pointerMargin = 10 * ms, pointerRadius = round(15 * ms))
+        ]
+
     # Generates batch of dropdowns
     if dropdowns:
 
@@ -117,7 +130,7 @@ def generateUI(window, settings, buttons=True, toggles=True, dropdowns=True, tex
                 resolutions.append(resolution)
 
         ui["dropdowns"] = [
-            Dropdown(window, (330 * ms, 170 * ms), (185 * ms, 45 * ms), f"{screen[0]} x {screen[1]}",
+            Dropdown(window, (330 * ms, 240 * ms), (185 * ms, 45 * ms), f"{screen[0]} x {screen[1]}",
             settings.get("fullscreen"), drawBorder=False, borderRadius=round(20 * ms), 
             items=[f"{resolution[0]} x {resolution[1]}" for resolution in resolutions],
             textSize=round(settings.get("TXTread") * ms), colorBase = settings.get("CRmenuL"),
@@ -129,9 +142,10 @@ def generateUI(window, settings, buttons=True, toggles=True, dropdowns=True, tex
     if text:
         settingsFont = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTread") * ms))
         ui["text"] = [
-            (settingsFont.render("Fullscreen", True, settings.get("CRstrokeL")), (185 * ms, 108 * ms)),
-            (settingsFont.render("Resolution", True, settings.get("CRstrokeL")), (185 * ms, 178 * ms)),
-            (settingsFont.render("UI Scale", True, settings.get("CRstrokeL")), (185 * ms, 248 * ms))
+            (settingsFont.render("UI Scale", True, settings.get("CRstrokeL")), (185 * ms, 108 * ms)),
+            (settingsFont.render("Fullscreen", True, settings.get("CRstrokeL")), (185 * ms, 178 * ms)),
+            (settingsFont.render("Resolution", True, settings.get("CRstrokeL")), (185 * ms, 248 * ms))
+            
         ]
     
     # Generates unclassifiable elements
@@ -164,6 +178,7 @@ def handleUI(window, settings, ui, position, pressed, released):
     for text in ui["text"]: window.blit(*text)
     for button in ui["buttons"]: button.update(position, pressed, released)
     for toggle in ui["toggles"]: toggle.update(position, released)
+    for slider in ui["sliders"]: slider.update(position, pressed, released)
     for dropdown in ui["dropdowns"]: dropdown.update(position, released)
     for button in ui["buttons"]: button.drawHint()
 
@@ -180,6 +195,21 @@ def handleUI(window, settings, ui, position, pressed, released):
         settings.save()
         window.toggleFullscreen()
         ui["dropdowns"][0].changeLock(settings.get("fullscreen"))
+    
+    # Dropdown change
+    if ui["dropdowns"][0].changed:
+        
+        # Changes screen resolution
+        value = ui["dropdowns"][0].selected.split(" x ")
+        value = list(map(int, value))
+        settings.set("screenX", value[0])
+        settings.set("screenY", value[1])
+        settings.save()
+        window.resize(*value)
+
+        # Updates dropdown
+        ui["dropdowns"] = generateUI(window, settings, buttons=False, toggles=False,
+        sliders=False, dropdowns=True, text=False, misc=False)["dropdowns"]
 
     # Handles buttons
     if ui["buttons"][0].send: pass
@@ -187,4 +217,19 @@ def handleUI(window, settings, ui, position, pressed, released):
     if ui["buttons"][2].send: return True, "predictions"
     if ui["buttons"][4].send: return False, "NA"
 
-    return 1
+    # Handles sliders
+    if ui["sliders"][0].changed:
+        sliders = ui["sliders"]
+        settings.set("menuScale", 0.65 + (0.7 * ui["sliders"][0].percent))
+        settings.save()
+        ui = generateUI(window, settings, sliders=False)
+        ui["sliders"] = sliders
+
+        width = 185 * ms
+        ui["sliders"][0].reconstruct(window, (330 * ms, 100 * ms), (width, 45 * ms), initialFill = \
+            width * ((settings.get("menuScale") - 0.65) / 0.7),
+            kwargs = {"colorBase":settings.get("CRmenuL"), "colorPointer":settings.get("CRhighlightL"),
+            "colorShadow":settings.get("CRhighlightD"), "trackMargin":17 * ms, "trackRadius":round(8 * ms),
+            "pointerMargin":10 * ms, "pointerRadius":round(15 * ms)})
+
+    return ui
