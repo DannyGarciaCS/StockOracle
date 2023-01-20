@@ -47,83 +47,99 @@ def getMouse(window):
 # Generates ui elements
 def generateUI(window, settings, buttons=True, text=True):
 
+    # More compact argument
+    ms = settings.get("menuScale")
+
     ui = {}
 
     # Generates batch of buttons
     if buttons:
         ui["buttons"] = [
-            Button(window, (5 * settings.get("menuScale"), 5 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
-            drawIcon=True, drawBackground=False,
+            Button(window, (5 * ms, 5 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/screenerIconBase.png",
             iconHighlight="media/screenerIconHighlight.png",
             iconClick="media/screenerIconClick.png",
-            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"), 110 * settings.get("menuScale")),
-            "Stock screener (Not Implemented Yet)", "U", 20 * settings.get("menuScale"))),
+            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings, (20 * ms, 110 * ms),
+            "Stock screener (Not Implemented Yet)", "U", 20 * ms)),
 
-            Button(window, (5 * settings.get("menuScale"), 105 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
-            drawIcon=True, drawBackground=False,
+            Button(window, (5 * ms, 105 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/rulesIconBase.png",
             iconHighlight="media/rulesIconHighlight.png",
             iconClick="media/rulesIconClick.png",
-            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"), 210 * settings.get("menuScale")),
-            "Rules editor (Not Implemented Yet)", "U", 20 * settings.get("menuScale"))),
+            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings, (20 *ms, 210 * ms),
+            "Rules editor (Not Implemented Yet)", "U", 20 * ms)),
 
-            Button(window, (5 * settings.get("menuScale"), 205 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")), "active",
-            drawIcon=True, drawBackground=False,
+            Button(window, (5 * ms, 205 * ms), (90 * ms, 90 * ms), "active", drawIcon=True, drawBackground=False,
             iconBase="media/predictionsIconBase.png",
             iconHighlight="media/predictionsIconHighlight.png",
             iconClick="media/predictionsIconClick.png",
-            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"), 310 * settings.get("menuScale")),
-            "Predictions dashboard", "U", 20 * settings.get("menuScale"))),
+            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings,
+            (20 * ms, 310 * ms), "Predictions dashboard", "U", 20 * ms)),
 
-            Button(window, (5 * settings.get("menuScale"), 1080 - 195 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
-            drawIcon=True, drawBackground=False,
+            Button(window, (5 * ms, 1080 - 195 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/settingsIconBase.png",
             iconHighlight="media/settingsIconHighlight.png",
             iconClick="media/settingsIconClick.png",
-            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"),
-            1080 - 260 * settings.get("menuScale")), "Change settings", "D", 20 * settings.get("menuScale"))),
+            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings,
+            (20 * ms, 1080 - 260 * ms), "Change settings", "D", 20 * ms)),
 
-
-            Button(window, (5 * settings.get("menuScale"), 1080 - 95 * settings.get("menuScale")),
-            (90 * settings.get("menuScale"), 90 * settings.get("menuScale")),
-            drawIcon=True, drawBackground=False,
+            Button(window, (5 * ms, 1080 - 95 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/exitIconBase.png",
             iconHighlight="media/exitIconHighlight.png",
             iconClick="media/exitIconClick.png",
-            iconSize=(55 * settings.get("menuScale"), 55 * settings.get("menuScale")), drawHint = True,
-            hintParameters = (window, settings, (20 * settings.get("menuScale"),
-            1080 - 160 * settings.get("menuScale")), "Quit Stock Oracle", "D", 20 * settings.get("menuScale")))
+            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings,
+            (20 * ms, 1080 - 160 * ms), "Quit Stock Oracle", "D", 20 * ms))
         ]
     
     if text:
-        settingsFont = pg.font.Font("media/latoBold.ttf", 30)
+        header = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
         ui["text"] = [
-            (settingsFont.render("Fullscreen", True, (227, 229, 233)), (185, 108)),
-            (settingsFont.render("Resolution", True, (227, 229, 233)), (185, 178))
+            (header.render("Ticker", True, settings.get("CRstrokeL")), (145 * ms, 1080 / 2 + 41 * ms)),
+            (header.render("Price", True, settings.get("CRstrokeL")), (255 * ms, 1080 / 2 + 41 * ms)),
+            (header.render("Low", True, settings.get("CRstrokeL")), (365 * ms, 1080 / 2 + 41 * ms)),
+            (header.render("High", True, settings.get("CRstrokeL")), (475 * ms, 1080 / 2 + 41 * ms)),
+            (header.render("Diff", True, settings.get("CRstrokeL")), (585 * ms, 1080 / 2 + 41 * ms)),
+            (header.render("Acc (?)", True, settings.get("CRstrokeL")), (695 * ms, 1080 / 2 + 41 * ms)),
         ]
 
     return ui
 
 def handleUI(window, settings, ui, position, pressed, released):
 
+    # More compact argument
+    ms = settings.get("menuScale")
+
     # Draws navigation menu
-    pg.draw.rect(window.display, settings.get("CRmenuL"), pg.Rect(0, 0, 100 * settings.get("menuScale"), 1080))
-    pg.draw.rect(window.display, settings.get("CRstrokeL"), pg.Rect(94 * settings.get("menuScale"),
-    210 * settings.get("menuScale"), 6 * settings.get("menuScale"), 80 * settings.get("menuScale")))
+    pg.draw.rect(window.display, settings.get("CRmenuL"), pg.Rect(0, 0, 100 * ms, 1080))
+    pg.draw.rect(window.display, settings.get("CRstrokeL"), pg.Rect(94 * ms, 210 * ms, 6 * ms, 80 * ms))
 
-    # pg.draw.rect(window.display, (50, 50, 150), pg.Rect(140, 15, 1765, 515))
-    # pg.draw.rect(window.display, (50, 150, 50), pg.Rect(140, 545, 1765, 520))
-    # pg.draw.rect(window.display, (75, 200, 75), pg.Rect(140, 545, 1765, 80))
+    # Predictions background
+    pg.draw.rect(window.display,  settings.get("CRmenuXD"), pg.Rect(100 * ms, 0, 1920 - 100 * ms, 1080 / 2))
+    pg.draw.rect(window.display,  settings.get("CRmenuXD"), pg.Rect(125 * ms,
+    1080 / 2 + 25 * ms, 1920 - 150 * ms, 1080 / 2 - 50 * ms))
+    pg.draw.rect(window.display,  settings.get("CRmenuL"), pg.Rect(125 * ms,
+    1080 / 2 + 25 * ms, 1920 - 150 * ms, 1080 / 2 - 50 * ms), round(4 * ms))
 
+    # Predictions body
+
+    # Predictions header
+    pg.draw.rect(window.display,  settings.get("CRmenuL"), pg.Rect(125 * ms,
+    1080 / 2 + 25 * ms, 1920 - 150 * ms, 60 * ms))
+    pg.draw.line(window.display, settings.get("CRmenuL"),
+    (235 * ms, 1080 / 2 + 85 * ms), (235 * ms, 1080 - 26 * ms), round(4 * ms))
+    pg.draw.line(window.display, settings.get("CRmenuL"),
+    (345 * ms, 1080 / 2 + 85 * ms), (345 * ms, 1080 - 26 * ms), round(4 * ms))
+    pg.draw.line(window.display, settings.get("CRmenuL"),
+    (455 * ms, 1080 / 2 + 85 * ms), (455 * ms, 1080 - 26 * ms), round(4 * ms))
+    pg.draw.line(window.display, settings.get("CRmenuL"),
+    (565 * ms, 1080 / 2 + 85 * ms), (565 * ms, 1080 - 26 * ms), round(4 * ms))
+    pg.draw.line(window.display, settings.get("CRmenuL"),
+    (675 * ms, 1080 / 2 + 85 * ms), (675 * ms, 1080 - 26 * ms), round(4 * ms))
+    pg.draw.line(window.display, settings.get("CRmenuL"),
+    (785 * ms, 1080 / 2 + 85 * ms), (785 * ms, 1080 - 26 * ms), round(4 * ms))
+
+    # Draws custom elements
+    for text in ui["text"]: window.blit(*text)
     for button in ui["buttons"]: button.update(position, pressed, released)
     for button in ui["buttons"]: button.drawHint()
 

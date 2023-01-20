@@ -28,3 +28,5 @@ CRbad::(215, 35, 35)
 
 # Text size settings
 TXTread::22
+TXTheader::24
+TXTtitle::30

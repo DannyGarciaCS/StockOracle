@@ -141,7 +141,9 @@ def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropd
     # Generates batch of text
     if text:
         settingsFont = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTread") * ms))
+        titleFont = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTtitle") * ms))
         ui["text"] = [
+            (titleFont.render("Settings", True, settings.get("CRstrokeL")), (130 * ms, 18 * ms)),
             (settingsFont.render("UI Scale", True, settings.get("CRstrokeL")), (185 * ms, 108 * ms)),
             (settingsFont.render("Fullscreen", True, settings.get("CRstrokeL")), (185 * ms, 178 * ms)),
             (settingsFont.render("Resolution", True, settings.get("CRstrokeL")), (185 * ms, 248 * ms))
@@ -171,8 +173,7 @@ def handleUI(window, settings, ui, position, pressed, released):
 
     # Draws settings container
     pg.draw.rect(window.display,  settings.get("CRmenuXD"), pg.Rect(125 * ms, 70 * ms,
-    1920 - 125 * ms - 25 * ms, 1080 - 70 * ms - 25 * ms),
-    border_radius=round(10 * ms))
+    1920 - 150 * ms, 1080 - 95 * ms), border_radius=round(10 * ms))
 
     # Draws custom elements
     for text in ui["text"]: window.blit(*text)
@@ -184,8 +185,8 @@ def handleUI(window, settings, ui, position, pressed, released):
 
     # Draws fullscreen warning warnings
     if settings.get("fullscreen"):
-        window.blit(ui["misc"][0], (540 * ms, 175 * ms))
-        window.blit(ui["misc"][1], (600 * ms, 180 * ms))
+        window.blit(ui["misc"][0], (540 * ms, 245 * ms))
+        window.blit(ui["misc"][1], (600 * ms, 250 * ms))
 
     # Handles toggles
     if ui["toggles"][0].changed:

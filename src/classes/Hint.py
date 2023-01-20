@@ -5,12 +5,14 @@ import pygame as pg
 class Hint:
 
     # Constructor
-    def __init__(self, window, settings, position, text, pointerDirection="-", pointerMargin=0):
+    def __init__(self, window, settings, position, text, spawnArea, debugSpawn=False, pointerDirection="-", pointerMargin=0):
 
         # Passed arguments
         self.window = window
         self.settings = settings
         self.position = position
+        self.spawnArea = spawnArea
+        self.debugSpawn = debugSpawn
         self.pointerDirection = pointerDirection
         self.pointerMargin = pointerMargin
 
@@ -28,6 +30,11 @@ class Hint:
         self.size = list(self.font.size(text))
         self.size[0] += self.margin * 2
         self.size[1] += self.margin * 2
+    
+    # Updates hint's status
+    def update(self, position):
+
+        self.draw()
 
     # Draws object status
     def draw(self):
