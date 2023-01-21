@@ -80,8 +80,8 @@ class Slider:
 
         # Displays comparator position for debugging
         if self.visuals["debugComparator"]:
-            pg.draw.rect(self.window.display, (255, 0, 0), pg.Rect(self.positionComparator[0],
-            self.positionComparator[1], self.sizeComparator[0], self.sizeComparator[1]))
+            pg.draw.rect(self.window.display, (0, 0, 255), pg.Rect(self.positionComparator[0],
+            self.positionComparator[1], self.sizeComparator[0], self.sizeComparator[1]), 1)
 
         # Draws track shadow
         pg.draw.rect(self.window.display, self.visuals["colorShadow"],

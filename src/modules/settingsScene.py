@@ -2,6 +2,7 @@
 import pygame as pg
 from sys import exit
 from src.classes.Button import Button
+from src.classes.Hint import Hint
 from src.classes.Toggle import Toggle
 from src.classes.Slider import Slider
 from src.classes.Dropdown import Dropdown
@@ -49,7 +50,8 @@ def getMouse(window):
     return position, pressed, released
 
 # Generates ui elements
-def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropdowns=True, text=True, misc=True):
+def generateUI(window, settings, buttons=True, toggles=True, sliders=True,
+dropdowns=True, text=True, hints=True, misc=True):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -60,39 +62,24 @@ def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropd
     if buttons:
         ui["buttons"] = [
             Button(window, (5 * ms, 5 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
-            iconBase="media/screenerIconBase.png",
-            iconHighlight="media/screenerIconHighlight.png",
-            iconClick="media/screenerIconClick.png",
-            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings, (20 * ms, 110 * ms),
-            "Stock screener (Not Implemented Yet)", "U", 20 * ms)),
+            iconBase="media/screenerIconBase.png", iconHighlight="media/screenerIconHighlight.png",
+            iconClick="media/screenerIconClick.png", iconSize=(55 * ms, 55 * ms)),
 
             Button(window, (5 * ms, 105 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
-            iconBase="media/rulesIconBase.png",
-            iconHighlight="media/rulesIconHighlight.png",
-            iconClick="media/rulesIconClick.png",
-            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings, (20 *ms, 210 * ms),
-            "Rules editor (Not Implemented Yet)", "U", 20 * ms)),
+            iconBase="media/rulesIconBase.png", iconHighlight="media/rulesIconHighlight.png",
+            iconClick="media/rulesIconClick.png", iconSize=(55 * ms, 55 * ms)),
 
             Button(window, (5 * ms, 205 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
-            iconBase="media/predictionsIconBase.png",
-            iconHighlight="media/predictionsIconHighlight.png",
-            iconClick="media/predictionsIconClick.png",
-            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings,
-            (20 * ms, 310 * ms), "Predictions dashboard", "U", 20 * ms)),
+            iconBase="media/predictionsIconBase.png", iconHighlight="media/predictionsIconHighlight.png",
+            iconClick="media/predictionsIconClick.png", iconSize=(55 * ms, 55 * ms)),
 
             Button(window, (5 * ms, 1080 - 195 * ms), (90 * ms, 90 * ms), "active", drawIcon=True, drawBackground=False,
-            iconBase="media/settingsIconBase.png",
-            iconHighlight="media/settingsIconHighlight.png",
-            iconClick="media/settingsIconClick.png",
-            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings,
-            (20 * ms, 1080 - 260 * ms), "Change settings", "D", 20 * ms)),
+            iconBase="media/settingsIconBase.png", iconHighlight="media/settingsIconHighlight.png",
+            iconClick="media/settingsIconClick.png", iconSize=(55 * ms, 55 * ms)),
 
             Button(window, (5 * ms, 1080 - 95 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
-            iconBase="media/exitIconBase.png",
-            iconHighlight="media/exitIconHighlight.png",
-            iconClick="media/exitIconClick.png",
-            iconSize=(55 * ms, 55 * ms), drawHint = True, hintParameters = (window, settings,
-            (20 * ms, 1080 - 160 * ms), "Quit Stock Oracle", "D", 20 * ms))
+            iconBase="media/exitIconBase.png", iconHighlight="media/exitIconHighlight.png",
+            iconClick="media/exitIconClick.png", iconSize=(55 * ms, 55 * ms))
         ]
 
     # Generates batch of toggles
@@ -103,6 +90,7 @@ def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropd
             colorActive=settings.get("CRhighlightL"), colorHighlight=settings.get("CRmenuXL"))
         ]
     
+    # Generates batch of sliders
     if sliders:
 
         width = 185 * ms
@@ -111,7 +99,7 @@ def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropd
             initialFill = width * ((settings.get("menuScale") - 0.65) / 0.7),
             colorBase=settings.get("CRmenuL"), colorPointer=settings.get("CRhighlightL"),
             colorShadow=settings.get("CRhighlightD"), trackMargin = 17 * ms, trackRadius = round(8 * ms),
-            pointerMargin = 10 * ms, pointerRadius = round(15 * ms))
+            pointerMargin = 10 * ms, pointerRadius = round(15 * ms), debugComparator=settings.get("debug"))
         ]
 
     # Generates batch of dropdowns
@@ -149,6 +137,21 @@ def generateUI(window, settings, buttons=True, toggles=True, sliders=True, dropd
             (settingsFont.render("Resolution", True, settings.get("CRstrokeL")), (185 * ms, 248 * ms))
             
         ]
+
+    # Generates batch of hints
+    if hints:
+        ui["hints"] = [
+            Hint(window, settings, (20 * ms, 110 * ms), (5 * ms, 5 * ms), (90 * ms, 90 * ms),
+            "Stock screener (Not Implemented Yet)", settings.get("debug"), "U", 20 * ms),
+            Hint(window, settings, (20 *ms, 210 * ms), (5 * ms, 105 * ms), (90 * ms, 90 * ms),
+            "Rules editor (Not Implemented Yet)", settings.get("debug"), "U", 20 * ms),
+            Hint(window, settings, (20 * ms, 310 * ms), (5 * ms, 205 * ms), (90 * ms, 90 * ms),
+            "Predictions dashboard", settings.get("debug"), "U", 20 * ms),
+            Hint(window, settings, (20 * ms, 1080 - 260 * ms), (5 * ms, 1080 - 195 * ms), (90 * ms, 90 * ms),
+            "Change settings", settings.get("debug"), "D", 20 * ms),
+            Hint(window, settings, (20 * ms, 1080 - 160 * ms), (5 * ms, 1080 - 95 * ms), (90 * ms, 90 * ms),
+            "Quit Stock Oracle", settings.get("debug"), "D", 20 * ms)
+        ]
     
     # Generates unclassifiable elements
     if misc:
@@ -181,7 +184,7 @@ def handleUI(window, settings, ui, position, pressed, released):
     for toggle in ui["toggles"]: toggle.update(position, released)
     for slider in ui["sliders"]: slider.update(position, pressed, released)
     for dropdown in ui["dropdowns"]: dropdown.update(position, released)
-    for button in ui["buttons"]: button.drawHint()
+    for hint in ui["hints"]: hint.update(position)
 
     # Draws fullscreen warning warnings
     if settings.get("fullscreen"):
@@ -231,6 +234,6 @@ def handleUI(window, settings, ui, position, pressed, released):
             width * ((settings.get("menuScale") - 0.65) / 0.7),
             kwargs = {"colorBase":settings.get("CRmenuL"), "colorPointer":settings.get("CRhighlightL"),
             "colorShadow":settings.get("CRhighlightD"), "trackMargin":17 * ms, "trackRadius":round(8 * ms),
-            "pointerMargin":10 * ms, "pointerRadius":round(15 * ms)})
+            "pointerMargin":10 * ms, "pointerRadius":round(15 * ms), "debugComparator":settings.get("debug")})
 
     return ui

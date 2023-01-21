@@ -30,3 +30,5 @@ CRbad::(215, 35, 35)
 TXTread::22
 TXTheader::24
 TXTtitle::30
+
+debug::True

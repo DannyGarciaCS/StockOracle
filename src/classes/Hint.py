@@ -5,13 +5,14 @@ import pygame as pg
 class Hint:
 
     # Constructor
-    def __init__(self, window, settings, position, text, spawnArea, debugSpawn=False, pointerDirection="-", pointerMargin=0):
+    def __init__(self, window, settings, drawPosition, position, size, text, debugSpawn=False, pointerDirection="-", pointerMargin=0):
 
         # Passed arguments
         self.window = window
         self.settings = settings
+        self.drawPosition = drawPosition
         self.position = position
-        self.spawnArea = spawnArea
+        self.size = size
         self.debugSpawn = debugSpawn
         self.pointerDirection = pointerDirection
         self.pointerMargin = pointerMargin
@@ -27,65 +28,74 @@ class Hint:
         # Text
         self.font = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTread") * settings.get("menuScale")))
         self.text = self.font.render(text, True, settings.get("CRstrokeL"))
-        self.size = list(self.font.size(text))
-        self.size[0] += self.margin * 2
-        self.size[1] += self.margin * 2
+        self.drawSize = list(self.font.size(text))
+        self.drawSize[0] += self.margin * 2
+        self.drawSize[1] += self.margin * 2
     
     # Updates hint's status
     def update(self, position):
+
+        # Hint is being hovered
+        if self.position[0] < position[0] < self.position[0] + self.size[0] and \
+        self.position[1] < position[1] < self.position[1] + self.size[1]:
+            self.show = True
+        else: self.show = False
 
         self.draw()
 
     # Draws object status
     def draw(self):
 
+        # Draws area for debugging
+        if self.debugSpawn: pg.draw.rect(self.window.display, (255, 0, 0), pg.Rect(*self.position, *self.size), 1)
+
         # Only draws hint if showing
         if self.show:
 
             # Draws body of hint
             pg.draw.rect(self.window.display, self.color, pg.Rect(
-            *self.position, *self.size), border_radius=self.borderRadius)
+            *self.drawPosition, *self.drawSize), border_radius=self.borderRadius)
 
             pg.draw.rect(self.window.display, (0, 0, 0), pg.Rect(
-            *self.position, *self.size), border_radius=self.borderRadius, width=self.borderSize)
+            *self.drawPosition, *self.drawSize), border_radius=self.borderRadius, width=self.borderSize)
             
-            self.window.blit(self.text, (self.position[0] + self.margin, self.position[1] + self.margin))
+            self.window.blit(self.text, (self.drawPosition[0] + self.margin, self.drawPosition[1] + self.margin))
 
             # Draws hint pointer
             if self.pointerDirection == "U":
 
                 pg.draw.polygon(self.window.display, self.color, [
-                (self.position[0] + self.pointerMargin, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
-                self.position[1] - self.pointerSize + self.borderSize)])
+                (self.drawPosition[0] + self.pointerMargin, self.drawPosition[1] + self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize, self.drawPosition[1] + self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
+                self.drawPosition[1] - self.pointerSize + self.borderSize)])
 
                 pg.draw.line(self.window.display, (0, 0, 0),
-                (self.position[0] + self.pointerMargin, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
-                self.position[1] - self.pointerSize + self.borderSize), width=self.borderSize)
+                (self.drawPosition[0] + self.pointerMargin, self.drawPosition[1] + self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
+                self.drawPosition[1] - self.pointerSize + self.borderSize), width=self.borderSize)
 
                 pg.draw.line(self.window.display, (0, 0, 0),
-                (self.position[0] + self.pointerMargin + self.pointerSize, self.position[1] + self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
-                self.position[1] - self.pointerSize + self.borderSize), width=self.borderSize)
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize, self.drawPosition[1] + self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
+                self.drawPosition[1] - self.pointerSize + self.borderSize), width=self.borderSize)
 
             elif self.pointerDirection == "D":
 
                 pg.draw.polygon(self.window.display, self.color, [
-                (self.position[0] + self.pointerMargin, self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize,
-                self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
-                self.position[1] + self.pointerSize + self.size[1] - self.borderSize)])
+                (self.drawPosition[0] + self.pointerMargin, self.drawPosition[1] + self.drawSize[1] - self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize,
+                self.drawPosition[1] + self.drawSize[1] - self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
+                self.drawPosition[1] + self.pointerSize + self.drawSize[1] - self.borderSize)])
 
                 pg.draw.line(self.window.display, (0, 0, 0),
-                (self.position[0] + self.pointerMargin, self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
-                self.position[1] + self.pointerSize + self.size[1] - self.borderSize), width=self.borderSize)
+                (self.drawPosition[0] + self.pointerMargin, self.drawPosition[1] + self.drawSize[1] - self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
+                self.drawPosition[1] + self.pointerSize + self.drawSize[1] - self.borderSize), width=self.borderSize)
 
                 pg.draw.line(self.window.display, (0, 0, 0),
-                (self.position[0] + self.pointerMargin + self.pointerSize,
-                self.position[1] + self.size[1] - self.borderSize),
-                (self.position[0] + self.pointerMargin + self.pointerSize / 2,
-                self.position[1] + self.pointerSize + self.size[1] - self.borderSize), width=self.borderSize)
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize,
+                self.drawPosition[1] + self.drawSize[1] - self.borderSize),
+                (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
+                self.drawPosition[1] + self.pointerSize + self.drawSize[1] - self.borderSize), width=self.borderSize)
