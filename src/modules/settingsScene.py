@@ -64,19 +64,15 @@ dropdowns=True, text=True, hints=True, misc=True):
             Button(window, (5 * ms, 5 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/screenerIconBase.png", iconHighlight="media/screenerIconHighlight.png",
             iconClick="media/screenerIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 105 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/rulesIconBase.png", iconHighlight="media/rulesIconHighlight.png",
             iconClick="media/rulesIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 205 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/predictionsIconBase.png", iconHighlight="media/predictionsIconHighlight.png",
             iconClick="media/predictionsIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 1080 - 195 * ms), (90 * ms, 90 * ms), "active", drawIcon=True, drawBackground=False,
             iconBase="media/settingsIconBase.png", iconHighlight="media/settingsIconHighlight.png",
             iconClick="media/settingsIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 1080 - 95 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/exitIconBase.png", iconHighlight="media/exitIconHighlight.png",
             iconClick="media/exitIconClick.png", iconSize=(55 * ms, 55 * ms))

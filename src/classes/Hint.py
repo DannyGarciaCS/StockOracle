@@ -5,7 +5,8 @@ import pygame as pg
 class Hint:
 
     # Constructor
-    def __init__(self, window, settings, drawPosition, position, size, text, debugSpawn=False, pointerDirection="-", pointerMargin=0):
+    def __init__(self, window, settings, drawPosition, position,
+    size, text, debugSpawn=False, pointerDirection="-", pointerMargin=0):
 
         # Passed arguments
         self.window = window

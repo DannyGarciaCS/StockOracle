@@ -23,12 +23,15 @@ CRstrokeD::(135, 135, 135)
 # Highlight colors
 CRhighlightL::(35,135,230)
 CRhighlightD::(40,85,235)
-CRgood::()
+CRgood::(5, 200, 50)
 CRbad::(215, 35, 35)
 
 # Text size settings
 TXTread::22
 TXTheader::24
 TXTtitle::30
+
+# Prediction settings
+collections::[1]
 
 debug::True

@@ -1,15 +1,19 @@
 # Imports
 import pygame as pg
 from sys import exit
+from src.classes.File import File
 from src.classes.Button import Button
 from src.classes.Hint import Hint
+import src.modules.stockHelper as sh
 
 # Initializes predictions scene
 def boot(window, settings):
 
     # Scene variables
     clock = pg.time.Clock()
-    ui = generateUI(window, settings)
+    predictionsData = File("data/predictions.datcs")
+    meta = sh.generateMeta(predictionsData)
+    ui = generateUI(window, settings, meta)
 
     # Main scene loop
     while True:
@@ -25,7 +29,7 @@ def boot(window, settings):
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
         # Updates window
-        response = handleUI(window, settings, ui, position, pressed, released)
+        response = handleUI(window, settings, ui, position, pressed, released, meta)
         if response != 1: return response
         window.update()
         window.fill(settings.get("CRmenuD"))
@@ -46,7 +50,7 @@ def getMouse(window):
     return position, pressed, released
 
 # Generates ui elements
-def generateUI(window, settings, buttons=True, text=True, hints=True):
+def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -59,27 +63,29 @@ def generateUI(window, settings, buttons=True, text=True, hints=True):
             Button(window, (5 * ms, 5 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/screenerIconBase.png", iconHighlight="media/screenerIconHighlight.png",
             iconClick="media/screenerIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 105 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/rulesIconBase.png", iconHighlight="media/rulesIconHighlight.png",
             iconClick="media/rulesIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 205 * ms), (90 * ms, 90 * ms), "active", drawIcon=True, drawBackground=False,
             iconBase="media/predictionsIconBase.png", iconHighlight="media/predictionsIconHighlight.png",
             iconClick="media/predictionsIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 1080 - 195 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/settingsIconBase.png", iconHighlight="media/settingsIconHighlight.png",
             iconClick="media/settingsIconClick.png", iconSize=(55 * ms, 55 * ms)),
-
             Button(window, (5 * ms, 1080 - 95 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
             iconBase="media/exitIconBase.png", iconHighlight="media/exitIconHighlight.png",
-            iconClick="media/exitIconClick.png", iconSize=(55 * ms, 55 * ms))
+            iconClick="media/exitIconClick.png", iconSize=(55 * ms, 55 * ms)),
+
+            Button(window, (1920 - 245 * ms, 1080 / 2 + 35 * ms), (210 * ms, 41 * ms), drawText=True,
+            text="Build Predictions", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
+            colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
+            colorClick=settings.get("CRmenuXD"))
         ]
     
     # Generates batch of text
     if text:
         header = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
+        headerBlack = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTheader") * ms))
         ui["text"] = [
             (header.render("Ticker", True, settings.get("CRstrokeL")), (145 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Price", True, settings.get("CRstrokeL")), (255 * ms, 1080 / 2 + 41 * ms)),
@@ -87,6 +93,9 @@ def generateUI(window, settings, buttons=True, text=True, hints=True):
             (header.render("High", True, settings.get("CRstrokeL")), (475 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Diff", True, settings.get("CRstrokeL")), (585 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Acc (?)", True, settings.get("CRstrokeL")), (695 * ms, 1080 / 2 + 41 * ms)),
+
+            (headerBlack.render(meta["updateDate"], True, settings.get("CRgood" if meta["validUpdate"] else "CRbad")),
+            (1920 - 390 * ms, 1080 / 2 + 41 * ms))
         ]
     
     # Generates batch of hints
@@ -114,12 +123,17 @@ def generateUI(window, settings, buttons=True, text=True, hints=True):
             Hint(window, settings, (315 * ms, 1080 / 2 + 90 * ms), (575 * ms, 1080 / 2 + 35 * ms), (90 * ms, 40 * ms),
             "Percentage difference between lowest and highest", settings.get("debug"), "U", 295 * ms),
             Hint(window, settings, (360 * ms, 1080 / 2 + 90 * ms), (685 * ms, 1080 / 2 + 35 * ms), (90 * ms, 40 * ms),
-            "Prediction's accuracy (based on previous predictions, not market status)", settings.get("debug"), "U", 360 * ms),
+            "Prediction's accuracy (based on previous predictions, not market status)",
+            settings.get("debug"), "U", 360 * ms),
+
+            Hint(window, settings, (1920 - 600 * ms, 1080 / 2 + 90 * ms), (1920 - 435 * ms, 1080 / 2 + 35 * ms),
+            (190 * ms, 40 * ms), "Date last predictions were built (red if out of date)",
+            settings.get("debug"), "U", 250 * ms)
         ]
 
     return ui
 
-def handleUI(window, settings, ui, position, pressed, released):
+def handleUI(window, settings, ui, position, pressed, released, meta):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -136,6 +150,7 @@ def handleUI(window, settings, ui, position, pressed, released):
     1080 / 2 + 25 * ms, 1920 - 150 * ms, 1080 / 2 - 50 * ms), round(4 * ms))
 
     # Predictions body
+    
 
     # Predictions header
     pg.draw.rect(window.display,  settings.get("CRmenuL"), pg.Rect(125 * ms,
@@ -152,6 +167,8 @@ def handleUI(window, settings, ui, position, pressed, released):
     (675 * ms, 1080 / 2 + 85 * ms), (675 * ms, 1080 - 26 * ms), round(4 * ms))
     pg.draw.line(window.display, settings.get("CRmenuL"),
     (785 * ms, 1080 / 2 + 85 * ms), (785 * ms, 1080 - 26 * ms), round(4 * ms))
+
+    pg.draw.circle(window.display, settings.get("CRgood" if meta["validUpdate"] else "CRbad"), (1920 - 415 * ms, 1080 / 2 + 56 * ms), 9 * ms)
 
     # Draws custom elements
     for text in ui["text"]: window.blit(*text)
