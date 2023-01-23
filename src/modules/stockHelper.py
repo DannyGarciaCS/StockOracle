@@ -19,12 +19,16 @@ def generateMeta(predictionsData):
 
         nyse = mcal.get_calendar("NYSE")
         today = dt.date.today()
-    
-    
+        dateRange = dt.timedelta(14)
+        start = today - dateRange
+
+        # Last trading day
+        lastTD = nyse.valid_days(start_date=start.strftime("%Y-%m-%d"), end_date=today.strftime("%Y-%m-%d"))[-1]
+        lastTD = lastTD.to_pydatetime().date()
+        invalidDate = not (lastUpdate >= lastTD)
+
     meta["validUpdate"] = not invalidDate
     meta["updateDate"] = predictionsData.get("lastUpdate")
-    
-    
 
     return meta
 
