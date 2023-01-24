@@ -23,8 +23,14 @@ def main():
         if scene == "predictions":
             running, scene = bootPredictions(window, settings)
         
+        # Loads settings scene
         elif scene == "settings":
             running, scene = bootSettings(window, settings)
+        
+        # Loads computing scene
+        elif scene == "computing":
+            import sys
+            sys.exit()
 
     # Closes pygame
     window.quit()

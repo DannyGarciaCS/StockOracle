@@ -33,4 +33,6 @@ def generateMeta(predictionsData):
     return meta
 
 def updateData():
-    pass
+    print(1)
+
+

@@ -60,41 +60,43 @@ class Button:
         self.textSize = self.font.size(self.visuals["text"])
     
     # Updates button's status
-    def update(self, position, pressed, released):
+    def update(self, position, pressed, released, blocked=False):
 
-        # Button is being hovered
-        if self.position[0] < position[0] < self.position[0] + self.size[0] and \
-        self.position[1] < position[1] < self.position[1] + self.size[1]:
+        if not blocked:
 
-            pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
-            self.hovering = True
+            # Button is being hovered
+            if self.position[0] < position[0] < self.position[0] + self.size[0] and \
+            self.position[1] < position[1] < self.position[1] + self.size[1]:
 
-            # Defines button visuals
-            if pressed[0]: self.status = "click"
-            else: self.status = "highlight"
+                pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
+                self.hovering = True
 
-            # Executes button signal if button released
-            if released == 1: self.send = True
-            else: self.send = False
+                # Defines button visuals
+                if pressed[0]: self.status = "click"
+                else: self.status = "highlight"
 
-        # User stopped hovering
-        elif self.hovering:
+                # Executes button signal if button released
+                if released == 1: self.send = True
+                else: self.send = False
 
-            pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
-            self.hovering = False
-            
-            # Defines button visuals
-            self.status = "base"
+            # User stopped hovering
+            elif self.hovering:
 
-        # Button is in permanent active state
-        if self.lock == "active":
-            self.status = "highlight"
-            self.send = False
+                pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+                self.hovering = False
+                
+                # Defines button visuals
+                self.status = "base"
 
-        # Button is in permanent inactive state
-        elif self.lock == "inactive":
-            self.status = "base"
-            self.send = False
+            # Button is in permanent active state
+            if self.lock == "active":
+                self.status = "highlight"
+                self.send = False
+
+            # Button is in permanent inactive state
+            elif self.lock == "inactive":
+                self.status = "base"
+                self.send = False
 
         self.draw()
 

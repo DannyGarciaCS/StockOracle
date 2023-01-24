@@ -21,3 +21,5 @@ TXTtitle::30
 TXTheader::24
 debug::True
 collections::[1]
+CRshadow::(30, 30, 30, 220)
+CRmenuXXD::(20, 20, 20)

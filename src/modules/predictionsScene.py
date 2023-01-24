@@ -56,6 +56,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
     ms = settings.get("menuScale")
 
     ui = {}
+    ui["blocked"] = False
 
     # Generates batch of buttons
     if buttons:
@@ -79,13 +80,24 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             Button(window, (1920 - 245 * ms, 1080 / 2 + 35 * ms), (210 * ms, 41 * ms), drawText=True,
             text="Build Predictions", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
             colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
-            colorClick=settings.get("CRmenuXD"))
+            colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms)),
+
+            Button(window, (1920 / 2 - 230 * ms, 1080 / 2 + 20 * ms), (220 * ms, 41 * ms), drawText=True,
+            text="Yes", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
+            colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
+            colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms)),
+            Button(window, (1920 / 2 + 10 * ms, 1080 / 2 + 20 * ms), (220 * ms, 41 * ms), drawText=True,
+            text="No", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
+            colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
+            colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms))
         ]
     
     # Generates batch of text
     if text:
         header = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
         headerBlack = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTheader") * ms))
+        warningSizes = [header.size("Do you want to update the data and make new predictions?"),
+        header.size("This might take some time.")]
         ui["text"] = [
             (header.render("Ticker", True, settings.get("CRstrokeL")), (145 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Price", True, settings.get("CRstrokeL")), (255 * ms, 1080 / 2 + 41 * ms)),
@@ -95,7 +107,12 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             (header.render("Acc (?)", True, settings.get("CRstrokeL")), (695 * ms, 1080 / 2 + 41 * ms)),
 
             (headerBlack.render(meta["updateDate"], True, settings.get("CRgood" if meta["validUpdate"] else "CRbad")),
-            (1920 - 390 * ms, 1080 / 2 + 41 * ms))
+            (1920 - 390 * ms, 1080 / 2 + 41 * ms)),
+
+            (header.render("Do you want to update the data and make new predictions?", True,
+            settings.get("CRstrokeL")), (1920 / 2 - warningSizes[0][0] / 2, 1080 / 2 - warningSizes[0][1] - 30 * ms)),
+            (header.render("This might take some time.", True, settings.get("CRstrokeL")),
+            (1920 / 2 - warningSizes[1][0] / 2, 1080 / 2 - warningSizes[1][1]))
         ]
     
     # Generates batch of hints
@@ -168,17 +185,45 @@ def handleUI(window, settings, ui, position, pressed, released, meta):
     pg.draw.line(window.display, settings.get("CRmenuL"),
     (785 * ms, 1080 / 2 + 85 * ms), (785 * ms, 1080 - 26 * ms), round(4 * ms))
 
-    pg.draw.circle(window.display, settings.get("CRgood" if meta["validUpdate"] else "CRbad"), (1920 - 415 * ms, 1080 / 2 + 56 * ms), 9 * ms)
+    pg.draw.circle(window.display, settings.get("CRgood" if meta["validUpdate"] else "CRbad"),
+    (1920 - 415 * ms, 1080 / 2 + 56 * ms), 9 * ms)
 
-    # Draws custom elements
-    for text in ui["text"]: window.blit(*text)
-    for button in ui["buttons"]: button.update(position, pressed, released)
-    for hint in ui["hints"]: hint.update(position)
+    # Draws custom non-warning elements
+    for text in ui["text"][:-2]: window.blit(*text)
+    for button in ui["buttons"][:-2]: button.update(position, pressed, released, ui["blocked"])
+    for hint in ui["hints"]: hint.update(position, ui["blocked"])
 
     # Handles navigation buttons
     if ui["buttons"][0].send: pass
     if ui["buttons"][1].send: pass
     if ui["buttons"][3].send: return True, "settings"
     if ui["buttons"][4].send: return False, "NA"
+
+    # Blocks ui and displays a warning
+    if ui["buttons"][5].send:
+        ui["blocked"] = True
+        pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
+        ui["buttons"][5].status = "base"
+        ui["buttons"][5].send = False
+    
+    # Predictions build warning
+    if ui["blocked"]:
+
+        # Warning background
+        window.fillTransparent(settings.get("CRshadow"))
+        pg.draw.rect(window.display, settings.get("CRmenuXXD"), pg.Rect(0, 1080 / 2 - 150 * ms, 1920, 300 * ms))
+
+        # Draws custom warning elements
+        for text in ui["text"][-2:]: window.blit(*text)
+        for button in ui["buttons"][-2:]: button.update(position, pressed, released)
+
+        # Handles warning buttons
+        if ui["buttons"][6].send:
+            pg.image.save(window.display,"media/predictions.jpg")
+            return True, "computing"
+        if ui["buttons"][7].send:
+            ui["buttons"][7].status = "base"
+            ui["buttons"][7].send = False
+            ui["blocked"] = False
 
     return 1

@@ -34,13 +34,15 @@ class Hint:
         self.drawSize[1] += self.margin * 2
     
     # Updates hint's status
-    def update(self, position):
+    def update(self, position, blocked=False):
 
-        # Hint is being hovered
-        if self.position[0] < position[0] < self.position[0] + self.size[0] and \
-        self.position[1] < position[1] < self.position[1] + self.size[1]:
-            self.show = True
-        else: self.show = False
+        if not blocked:
+
+            # Hint is being hovered
+            if self.position[0] < position[0] < self.position[0] + self.size[0] and \
+            self.position[1] < position[1] < self.position[1] + self.size[1]:
+                self.show = True
+            else: self.show = False
 
         self.draw()
 
