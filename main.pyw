@@ -5,6 +5,7 @@ from src.classes.Window import Window
 from src.modules.soInit import soInit
 from src.modules.predictionsScene import boot as bootPredictions
 from src.modules.settingsScene import boot as bootSettings
+from src.modules.computingScene import boot as bootComputing
 
 # Main function
 def main():
@@ -29,8 +30,7 @@ def main():
         
         # Loads computing scene
         elif scene == "computing":
-            import sys
-            sys.exit()
+            running, scene = bootComputing(window, settings)
 
     # Closes pygame
     window.quit()

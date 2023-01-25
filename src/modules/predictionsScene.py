@@ -1,6 +1,5 @@
 # Imports
 import pygame as pg
-from sys import exit
 from src.classes.File import File
 from src.classes.Button import Button
 from src.classes.Hint import Hint
@@ -219,6 +218,7 @@ def handleUI(window, settings, ui, position, pressed, released, meta):
 
         # Handles warning buttons
         if ui["buttons"][6].send:
+            pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
             pg.image.save(window.display,"media/predictions.jpg")
             return True, "computing"
         if ui["buttons"][7].send:
