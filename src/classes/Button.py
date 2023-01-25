@@ -48,11 +48,11 @@ class Button:
 
         # Icon preparation (Extract if dynamic buttons needed)
         self.iconBase = pg.image.load(self.visuals["iconBase"]).convert_alpha()
-        self.iconBase = pg.transform.scale(self.iconBase, self.visuals["iconSize"])
+        self.iconBase = pg.transform.smoothscale(self.iconBase, self.visuals["iconSize"])
         self.iconHighlight = pg.image.load(self.visuals["iconHighlight"]).convert_alpha()
-        self.iconHighlight = pg.transform.scale(self.iconHighlight, self.visuals["iconSize"])
+        self.iconHighlight = pg.transform.smoothscale(self.iconHighlight, self.visuals["iconSize"])
         self.iconClick = pg.image.load(self.visuals["iconClick"]).convert_alpha()
-        self.iconClick = pg.transform.scale(self.iconClick, self.visuals["iconSize"])
+        self.iconClick = pg.transform.smoothscale(self.iconClick, self.visuals["iconSize"])
 
         # Text preparation (Extract if dynamic buttons needed)
         self.font = pg.font.Font("media/latoBlack.ttf", self.visuals["textSize"])

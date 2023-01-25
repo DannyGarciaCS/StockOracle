@@ -154,7 +154,7 @@ dropdowns=True, text=True, hints=True, misc=True):
         warningFont = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTread") * ms))
         warningIcon = pg.image.load("media/warningIcon.png").convert_alpha()
         ui["misc"] = [
-            pg.transform.scale(warningIcon, (38 * ms, 38 * ms)),
+            pg.transform.smoothscale(warningIcon, (38 * ms, 38 * ms)),
             warningFont.render("Resolution can't be changed on fullscreen mode", True, settings.get("CRbad"))
         ]
 

@@ -72,7 +72,7 @@ class Window:
             
             # Changes resolution to selection
             self.screenX, self.screenY = self.settings.get("screenX"), self.settings.get("screenY")
-            self.screen = pg.display.set_mode((self.screenX, self.screenY))
+            self.screen = pg.display.set_mode((self.screenX, self.screenY), vsync=1)
             
         # Computes aspect ratio and resets mouse status
         self.aspectX = self.displayX / self.screenX

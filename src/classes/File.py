@@ -17,14 +17,21 @@ class File:
 
                 for line in file.readlines():
 
-                    # Cleans up line of data
-                    line = "".join(line.split())
-                    line = line.split("#")[0]
-                    info = line.split("::")
+                    # Line is reading a string
+                    if "\"" in line:
+                        line = line.split("\"")
+                        self.data[line[0].strip().split("::")[0]] = f"{line[1]}"
+                    
+                    else:
 
-                    # If line is valid, add it to data
-                    if line != "" and len(info) == 2:
-                        self.data[info[0]] = eval(info[1])
+                        # Cleans up line of data
+                        line = "".join(line.split())
+                        line = line.split("#")[0]
+                        info = line.split("::")
+
+                        # If line is valid, add it to data
+                        if line != "" and len(info) == 2:
+                            self.data[info[0]] = eval(info[1])
 
     # Saves current data
     def save(self):
