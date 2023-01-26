@@ -36,4 +36,4 @@ TXTtitle::30
 # Prediction settings
 collections::[1]
 
-debug::True
+debug::False

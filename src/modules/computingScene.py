@@ -2,13 +2,43 @@
 import pygame as pg
 from src.classes.File import File
 import src.modules.stockHelper as sh
+from threading import Thread
 
 # Initializes predictions scene
 def boot(window, settings):
 
+    # Creates threads
+    visualThread = Thread(target=programLoop, args=(window, settings,))
+    computationThread = Thread(target=updatePredictions, args=(settings,))
+
+    # Starts threads
+    visualThread.start()
+    computationThread.start()
+
+    # Waits for threads to be done
+    visualThread.join()
+    computationThread.join()
+
+    return True, "predictions"
+
+def updatePredictions(settings):
+    
+    for i in range(200000): print(i)
+
+    predictionsData = File("data/predictions.datcs")
+    predictionsData.set("finishedUpdating", True)
+    predictionsData.save()
+
+# Visual thread
+def programLoop(window, settings):
+
     # Scene variables
     clock = pg.time.Clock()
     ui = generateUI(settings)
+
+    predictionsData = File("data/predictions.datcs")
+    predictionsData.set("finishedUpdating", False)
+    predictionsData.save()
 
     # Main scene loop
     while True:
@@ -21,7 +51,7 @@ def boot(window, settings):
 
         # Updates window
         response = handleUI(window, settings, ui)
-        if response != 1: return response
+        if response != 1: break
         window.update()
         window.blit(ui["misc"][0], (0, 0))
         clock.tick(60)
@@ -47,6 +77,7 @@ def generateUI(settings, misc=True):
 
     return ui
 
+# Handles input and visualization
 def handleUI(window, settings, ui):
 
     # More compact argument
@@ -67,10 +98,12 @@ def handleUI(window, settings, ui):
     message = predictionsData.get("loadingMessage")
     title = ui["titleFont"].render(title, True, settings.get("CRstrokeL"))
     message = ui["messageFont"].render(message, True, settings.get("CRstrokeL"))
-    window.blit(title, (1920 / 2 - ui["titleFont"].size(predictionsData.get("loadingTitle"))[0] / 2, 1080 / 2 + 25))
-    window.blit(message, (1920 / 2 - ui["messageFont"].size(predictionsData.get("loadingMessage"))[0] / 2, 1080 / 2 + 65))
+    window.blit(title, (1920 / 2 - ui["titleFont"].size(predictionsData.get("loadingTitle"))[0] / 2, 1080 / 2 + 25 * ms))
+    window.blit(message, (1920 / 2 - ui["messageFont"].size(predictionsData.get("loadingMessage"))[0] / 2, 1080 / 2 + 65 * ms))
 
-    return 1
+    # Continues or quits based on prediction data
+    if(predictionsData.get("finishedUpdating")): 0
+    else: return 1
 
 # Rotates an image from the center
 def rotateCenter(image, angle):

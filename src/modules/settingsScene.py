@@ -160,6 +160,7 @@ dropdowns=True, text=True, hints=True, misc=True):
 
     return ui
 
+# Handles input and visualization
 def handleUI(window, settings, ui, position, pressed, released):
 
     # More compact argument

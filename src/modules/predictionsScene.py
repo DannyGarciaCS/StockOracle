@@ -149,6 +149,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
 
     return ui
 
+# Handles input and visualization
 def handleUI(window, settings, ui, position, pressed, released, meta):
 
     # More compact argument
