@@ -105,7 +105,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             (header.render("Diff", True, settings.get("CRstrokeL")), (585 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Acc (?)", True, settings.get("CRstrokeL")), (695 * ms, 1080 / 2 + 41 * ms)),
 
-            (headerBlack.render(meta["updateDate"], True, settings.get("CRgood" if meta["validUpdate"] else "CRbad")),
+            (headerBlack.render(meta["updateDate"], True, settings.get("CRgood" if meta["validDate"] else "CRbad")),
             (1920 - 390 * ms, 1080 / 2 + 41 * ms)),
 
             (header.render("Do you want to update the data and make new predictions?", True,
@@ -185,7 +185,7 @@ def handleUI(window, settings, ui, position, pressed, released, meta):
     pg.draw.line(window.display, settings.get("CRmenuL"),
     (785 * ms, 1080 / 2 + 85 * ms), (785 * ms, 1080 - 26 * ms), round(4 * ms))
 
-    pg.draw.circle(window.display, settings.get("CRgood" if meta["validUpdate"] else "CRbad"),
+    pg.draw.circle(window.display, settings.get("CRgood" if meta["validDate"] else "CRbad"),
     (1920 - 415 * ms, 1080 / 2 + 56 * ms), 9 * ms)
 
     # Draws custom non-warning elements

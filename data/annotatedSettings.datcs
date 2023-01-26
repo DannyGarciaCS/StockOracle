@@ -34,6 +34,7 @@ TXTheader::24
 TXTtitle::30
 
 # Prediction settings
-collections::[1]
+collectionNames::['SNP400', 'SNP500', 'SNP600', 'DOWINDUSTRIAL', 'DOWTRANSPORTATION', 'DOWUTILITY', 'NASDAQ100', 'RUSSELL1000']
+collections::[1, 2]
 
 debug::False

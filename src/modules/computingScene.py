@@ -2,41 +2,26 @@
 import pygame as pg
 from src.classes.File import File
 import src.modules.stockHelper as sh
-from threading import Thread
+from multiprocessing import Process
 
 # Initializes predictions scene
 def boot(window, settings):
 
-    # Creates threads
-    visualThread = Thread(target=programLoop, args=(window, settings,))
-    computationThread = Thread(target=updatePredictions, args=(settings,))
-
-    # Starts threads
-    visualThread.start()
+    # Starts computational thread
+    computationThread = Process(target=updatePredictions, args=(settings,))
     computationThread.start()
-
-    # Waits for threads to be done
-    visualThread.join()
-    computationThread.join()
-
-    return True, "predictions"
-
-def updatePredictions(settings):
     
-    for i in range(200000): print(i)
-
-    predictionsData = File("data/predictions.datcs")
-    predictionsData.set("finishedUpdating", True)
-    predictionsData.save()
-
-# Visual thread
-def programLoop(window, settings):
-
     # Scene variables
     clock = pg.time.Clock()
     ui = generateUI(settings)
 
+    # Loads data avoiding update errors
     predictionsData = File("data/predictions.datcs")
+    while predictionsData.data == {}:
+        predictionsData = File("data/predictions.datcs")
+
+    predictionsData.set("loadingTitle", "Updating data")
+    predictionsData.set("loadingMessage", "Fetching ticker list")
     predictionsData.set("finishedUpdating", False)
     predictionsData.save()
 
@@ -47,7 +32,9 @@ def programLoop(window, settings):
         for event in pg.event.get():
 
             # Cross is pressed
-            if event.type == pg.QUIT: return False, ""
+            if event.type == pg.QUIT:
+                computationThread.terminate()
+                return False, ""
 
         # Updates window
         response = handleUI(window, settings, ui)
@@ -55,6 +42,27 @@ def programLoop(window, settings):
         window.update()
         window.blit(ui["misc"][0], (0, 0))
         clock.tick(60)
+
+    return True, "predictions"
+
+# Computational thread
+def updatePredictions(settings):
+    
+    # Loads data avoiding update errors
+    predictionsData = File("data/predictions.datcs")
+    while predictionsData.data == {}:
+        predictionsData = File("data/predictions.datcs")
+
+    # Updates data used by predictions
+    sh.dataCollection(settings)
+
+    # Builds predictive models
+
+    # Makes predictions
+
+    # Finishes updating
+    predictionsData.set("finishedUpdating", True)
+    predictionsData.save()
 
 # Generates ui elements
 def generateUI(settings, misc=True):
@@ -92,8 +100,13 @@ def handleUI(window, settings, ui):
     1080 / 2 - loadingFrame.get_height() / 2 - 40 * ms))
     ui["loadingFrame"] += 3
 
-    # Draws loading text
+    
+    # Loads data avoiding update errors
     predictionsData = File("data/predictions.datcs")
+    while predictionsData.data == {}:
+        predictionsData = File("data/predictions.datcs")
+
+    # Draws loading text
     title = predictionsData.get("loadingTitle")
     message = predictionsData.get("loadingMessage")
     title = ui["titleFont"].render(title, True, settings.get("CRstrokeL"))
