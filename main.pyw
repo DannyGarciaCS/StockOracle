@@ -1,17 +1,16 @@
 # Imports
-import pygame as pg
-from src.classes.File import File
+from src.classes.DataFile import DataFile
 from src.classes.Window import Window
-from src.modules.soInit import soInit
+from src.modules.computingScene import boot as bootComputing
 from src.modules.predictionsScene import boot as bootPredictions
 from src.modules.settingsScene import boot as bootSettings
-from src.modules.computingScene import boot as bootComputing
+from src.modules.soInit import soInit
 
 # Main function
 def main():
 
     # Initializes data
-    settings = File("data/settings.datcs")
+    settings = DataFile("data/settings.datcs")
     if settings.get("initialBoot"): soInit(settings)
     window = Window(settings, "Market Oracle")
     scene = "predictions"

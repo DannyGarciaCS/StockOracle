@@ -27,8 +27,8 @@ class Toggle:
         }
 
         # Replaces all passed visual arguments
-        for key in kwargs.keys():
-            if key in self.visuals.keys():
+        for key in kwargs:
+            if key in self.visuals:
                 self.visuals[key] = kwargs[key]
     
     # Updates toggle's status
@@ -50,7 +50,6 @@ class Toggle:
 
         # Toggle is not being hovered
         elif self.hovering:
-            
             pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
             self.hovering = False
 
@@ -61,7 +60,7 @@ class Toggle:
 
         size = self.size[1] - self.visuals["margin"] * 2
 
-        # Toggle is off
+        # Toggle off toggle
         if self.active:
             pg.draw.rect(self.window.display, self.visuals["colorActive"],
             pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])
@@ -70,7 +69,7 @@ class Toggle:
             pg.Rect(self.position[0] + self.size[0] - size - self.visuals["margin"],
             self.position[1] + self.visuals["margin"], size, size), border_radius=self.visuals["borderRadius"])
         
-        # Toggle is on
+        # Toggle on toggle
         else:
             pg.draw.rect(self.window.display, self.visuals["colorBase"],
             pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])

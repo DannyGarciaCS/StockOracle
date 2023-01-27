@@ -42,8 +42,8 @@ class Button:
         }
 
         # Replaces all passed visual arguments
-        for key in kwargs.keys():
-            if key in self.visuals.keys():
+        for key in kwargs:
+            if key in self.visuals:
                 self.visuals[key] = kwargs[key]
 
         # Icon preparation (Extract if dynamic buttons needed)
@@ -70,22 +70,14 @@ class Button:
 
                 pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_HAND)
                 self.hovering = True
+                self.status = "click" if pressed[0] else "highlight"
+                self.send = released == 1
 
-                # Defines button visuals
-                if pressed[0]: self.status = "click"
-                else: self.status = "highlight"
-
-                # Executes button signal if button released
-                if released == 1: self.send = True
-                else: self.send = False
-
-            # User stopped hovering
+            # Button stopped being hovered
             elif self.hovering:
 
                 pg.mouse.set_system_cursor(pg.SYSTEM_CURSOR_ARROW)
                 self.hovering = False
-                
-                # Defines button visuals
                 self.status = "base"
 
             # Button is in permanent active state
@@ -103,8 +95,9 @@ class Button:
     # Draws button's status
     def draw(self):
 
-        # Draws body of button
         if self.visuals["drawBackground"]:
+
+            # Draws body of button
             if self.status == "base":
                 pg.draw.rect(self.window.display, self.visuals["colorBase"],
                 pg.Rect(*self.position, *self.size), border_radius=self.visuals["borderRadius"])

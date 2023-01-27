@@ -1,6 +1,5 @@
 # Imports
-from src.classes.File import File
-import pygame as pg
+from src.classes.DataFile import DataFile
 import ctypes
 
 # Initial program configuration
@@ -19,7 +18,7 @@ def soInit(settings):
         else: break
     
     # Resets settings to the originals
-    originalSettings = File("data/annotatedSettings.datcs")
+    originalSettings = DataFile("data/annotatedSettings.datcs")
     for key in originalSettings.data:
         settings.set(key, originalSettings.data[key])
     

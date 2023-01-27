@@ -1,11 +1,11 @@
 # Imports
-import pygame as pg
 from sys import exit
 from src.classes.Button import Button
 from src.classes.Hint import Hint
 from src.classes.Toggle import Toggle
 from src.classes.Slider import Slider
 from src.classes.Dropdown import Dropdown
+import pygame as pg
 
 # Initializes predictions scene
 def boot(window, settings):
@@ -85,7 +85,7 @@ dropdowns=True, text=True, hints=True, misc=True):
             borderRadius=round(20 * ms), margin=5 * ms, colorBase=settings.get("CRmenuL"),
             colorActive=settings.get("CRhighlightL"), colorHighlight=settings.get("CRmenuXL"))
         ]
-    
+
     # Generates batch of sliders
     if sliders:
 
@@ -104,15 +104,9 @@ dropdowns=True, text=True, hints=True, misc=True):
         # Fetches screen settings
         screen = [settings.get("screenX"), settings.get("screenY")]
         display = [settings.get("displayX"), settings.get("displayY")]
-        resolutions = []
-
-        # Fetches valid resolutions
-        for resolution in [[720, 480], [854, 480], [960, 540], [1280, 720], [1366, 768], [1600, 900],
-        [1920, 1080], [2560, 1440], [3200, 1800], [3840, 2160], [5120, 2880], [7680, 4320]]:
-
-            if resolution != screen and resolution[0] <= display[0] and resolution[1] <= display[1]:
-                resolutions.append(resolution)
-
+        resolutions = [resolution for resolution in [[720, 480], [854, 480], [960, 540], [1280, 720], [1366, 768],
+        [1600, 900], [1920, 1080], [2560, 1440], [3200, 1800], [3840, 2160], [5120, 2880], [7680, 4320]] if \
+        resolution != screen and resolution[0] <= display[0] and resolution[1] <= display[1]]
         ui["dropdowns"] = [
             Dropdown(window, (330 * ms, 240 * ms), (185 * ms, 45 * ms), f"{screen[0]} x {screen[1]}",
             settings.get("fullscreen"), drawBorder=False, borderRadius=round(20 * ms), 
@@ -121,7 +115,7 @@ dropdowns=True, text=True, hints=True, misc=True):
             colorHighlight = settings.get("CRmenuXL"), textColor = settings.get("CRstrokeL"),
             lockedColor = settings.get("CRstrokeD"))
         ]
-    
+
     # Generates batch of text
     if text:
         settingsFont = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTread") * ms))
@@ -131,7 +125,7 @@ dropdowns=True, text=True, hints=True, misc=True):
             (settingsFont.render("UI Scale", True, settings.get("CRstrokeL")), (185 * ms, 108 * ms)),
             (settingsFont.render("Fullscreen", True, settings.get("CRstrokeL")), (185 * ms, 178 * ms)),
             (settingsFont.render("Resolution", True, settings.get("CRstrokeL")), (185 * ms, 248 * ms))
-            
+
         ]
 
     # Generates batch of hints
@@ -148,7 +142,7 @@ dropdowns=True, text=True, hints=True, misc=True):
             Hint(window, settings, (20 * ms, 1080 - 160 * ms), (5 * ms, 1080 - 95 * ms), (90 * ms, 90 * ms),
             "Quit Stock Oracle", settings.get("debug"), "D", 20 * ms)
         ]
-    
+
     # Generates unclassifiable elements
     if misc:
         warningFont = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTread") * ms))

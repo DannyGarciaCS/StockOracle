@@ -1,6 +1,6 @@
 # Imports
-import pygame as pg
 import ctypes
+import pygame as pg
 
 # Window class
 class Window:

@@ -19,10 +19,8 @@ class Slider:
     # Updates button's status
     def update(self, position, pressed, released):
 
-
-        self.last = self.fill
-
         # Slider is being hovered
+        self.last = self.fill
         if self.positionComparator[0] < position[0] < self.positionComparator[0] + self.sizeComparator[0] and \
         self.positionComparator[1] < position[1] < self.positionComparator[1] + self.sizeComparator[1]:
 
@@ -44,7 +42,6 @@ class Slider:
                 self.positionComparator = self.position
                 self.sizeComparator = self.size
                 self.queueComparator = True
-                
 
         # Slider stopped being hovered
         elif self.hovering:
@@ -53,13 +50,12 @@ class Slider:
             self.hovering = False
             if released == 1: self.status = "base"
 
-        # Slider is not being hovered
-        else:
-            if released == 1:
-                self.status = "base"
-                self.positionComparator = self.position
-                self.sizeComparator = self.size
-                self.queueComparator = True
+        # Slider was released
+        elif released == 1:
+            self.status = "base"
+            self.positionComparator = self.position
+            self.sizeComparator = self.size
+            self.queueComparator = True
 
         # Updates status
         if self.status == "held":
@@ -129,5 +125,5 @@ class Slider:
 
         # Replaces all passed visual arguments
         for key in kwargs.keys():
-            if key in self.visuals.keys():
+            if key in self.visuals:
                 self.visuals[key] = kwargs[key]

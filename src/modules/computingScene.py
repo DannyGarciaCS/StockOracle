@@ -1,8 +1,8 @@
 # Imports
-import pygame as pg
-from src.classes.File import File
-import src.modules.stockHelper as sh
 from multiprocessing import Process
+import src.modules.stockHelper as sh
+from src.classes.DataFile import DataFile
+import pygame as pg
 
 # Initializes predictions scene
 def boot(window, settings):
@@ -16,10 +16,11 @@ def boot(window, settings):
     ui = generateUI(settings)
 
     # Loads data avoiding update errors
-    predictionsData = File("data/predictions.datcs")
+    predictionsData = DataFile("data/predictions.datcs")
     while predictionsData.data == {}:
-        predictionsData = File("data/predictions.datcs")
+        predictionsData = DataFile("data/predictions.datcs")
 
+    # Initializes predictions data
     predictionsData.set("loadingTitle", "Updating data")
     predictionsData.set("loadingMessage", "Fetching ticker list")
     predictionsData.set("finishedUpdating", False)
@@ -49,16 +50,14 @@ def boot(window, settings):
 def updatePredictions(settings):
     
     # Loads data avoiding update errors
-    predictionsData = File("data/predictions.datcs")
+    predictionsData = DataFile("data/predictions.datcs")
     while predictionsData.data == {}:
-        predictionsData = File("data/predictions.datcs")
+        predictionsData = DataFile("data/predictions.datcs")
 
-    # Updates data used by predictions
-    sh.dataCollection(settings)
-
-    # Builds predictive models
-
-    # Makes predictions
+    # Executes all stages of prediction
+    sh.collectData(settings)
+    sh.buildModels(settings)
+    sh.makePredictions(settings)
 
     # Finishes updating
     predictionsData.set("finishedUpdating", True)
@@ -70,11 +69,13 @@ def generateUI(settings, misc=True):
     # More compact argument
     ms = settings.get("menuScale")
 
-    ui = {}
-    ui["loadingFrame"] = 0
-    ui["titleFont"] = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTtitle") * ms))
-    ui["messageFont"] = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
+    ui = {
+        "loadingFrame": 0,
+        "titleFont": pg.font.Font("media/latoBold.ttf", round(settings.get("TXTtitle") * ms)),
+    }
     
+    ui["messageFont"] = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
+
     # Generates unclassifiable elements
     if misc:
         loadingIcon = pg.image.load("media/loadingIcon.png").convert_alpha()
@@ -100,19 +101,20 @@ def handleUI(window, settings, ui):
     1080 / 2 - loadingFrame.get_height() / 2 - 40 * ms))
     ui["loadingFrame"] += 3
 
-    
     # Loads data avoiding update errors
-    predictionsData = File("data/predictions.datcs")
+    predictionsData = DataFile("data/predictions.datcs")
     while predictionsData.data == {}:
-        predictionsData = File("data/predictions.datcs")
+        predictionsData = DataFile("data/predictions.datcs")
 
     # Draws loading text
     title = predictionsData.get("loadingTitle")
     message = predictionsData.get("loadingMessage")
     title = ui["titleFont"].render(title, True, settings.get("CRstrokeL"))
     message = ui["messageFont"].render(message, True, settings.get("CRstrokeL"))
-    window.blit(title, (1920 / 2 - ui["titleFont"].size(predictionsData.get("loadingTitle"))[0] / 2, 1080 / 2 + 25 * ms))
-    window.blit(message, (1920 / 2 - ui["messageFont"].size(predictionsData.get("loadingMessage"))[0] / 2, 1080 / 2 + 65 * ms))
+    window.blit(title, (1920 / 2 - ui["titleFont"].size(
+    predictionsData.get("loadingTitle"))[0] / 2, 1080 / 2 + 25 * ms))
+    window.blit(message, (1920 / 2 - ui["messageFont"].size(
+    predictionsData.get("loadingMessage"))[0] / 2, 1080 / 2 + 65 * ms))
 
     # Continues or quits based on prediction data
     if(predictionsData.get("finishedUpdating")): 0

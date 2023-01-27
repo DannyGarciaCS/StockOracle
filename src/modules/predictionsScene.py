@@ -1,16 +1,16 @@
 # Imports
-import pygame as pg
-from src.classes.File import File
+from src.classes.DataFile import DataFile
 from src.classes.Button import Button
 from src.classes.Hint import Hint
 import src.modules.stockHelper as sh
+import pygame as pg
 
 # Initializes predictions scene
 def boot(window, settings):
 
     # Scene variables
     clock = pg.time.Clock()
-    predictionsData = File("data/predictions.datcs")
+    predictionsData = DataFile("data/predictions.datcs")
     meta = sh.generateMeta(predictionsData)
     ui = generateUI(window, settings, meta)
 
@@ -54,10 +54,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
     # More compact argument
     ms = settings.get("menuScale")
 
-    ui = {}
-    ui["blocked"] = False
-
-    # Generates batch of buttons
+    ui = {"blocked": False}
     if buttons:
         ui["buttons"] = [
             Button(window, (5 * ms, 5 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
@@ -90,7 +87,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
             colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms))
         ]
-    
+
     # Generates batch of text
     if text:
         header = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
@@ -113,7 +110,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             (header.render("This might take some time.", True, settings.get("CRstrokeL")),
             (1920 / 2 - warningSizes[1][0] / 2, 1080 / 2 - warningSizes[1][1]))
         ]
-    
+
     # Generates batch of hints
     if hints:
         ui["hints"] = [

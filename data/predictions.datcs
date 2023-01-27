@@ -1,4 +1,4 @@
 lastUpdate::"13/01/2023"
 loadingTitle::"Updating data"
-loadingMessage::"Fetching ADI (41/1101 - 3.72%)"
-finishedUpdating::False
+loadingMessage::"Fetching ticker list"
+finishedUpdating::True

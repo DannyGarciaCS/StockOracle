@@ -36,13 +36,10 @@ class Hint:
     # Updates hint's status
     def update(self, position, blocked=False):
 
+        # Hint is being hovered
         if not blocked:
-
-            # Hint is being hovered
-            if self.position[0] < position[0] < self.position[0] + self.size[0] and \
-            self.position[1] < position[1] < self.position[1] + self.size[1]:
-                self.show = True
-            else: self.show = False
+            self.show = (self.position[0] < position[0] < self.position[0] + self.size[0] and \
+            self.position[1] < position[1] < self.position[1] + self.size[1])
 
         self.draw()
 
@@ -64,7 +61,7 @@ class Hint:
             
             self.window.blit(self.text, (self.drawPosition[0] + self.margin, self.drawPosition[1] + self.margin))
 
-            # Draws hint pointer
+            # Draws hint pointer looking up
             if self.pointerDirection == "U":
 
                 pg.draw.polygon(self.window.display, self.color, [
@@ -83,6 +80,7 @@ class Hint:
                 (self.drawPosition[0] + self.pointerMargin + self.pointerSize / 2,
                 self.drawPosition[1] - self.pointerSize + self.borderSize), width=self.borderSize)
 
+            # Draws hint pointer looking down
             elif self.pointerDirection == "D":
 
                 pg.draw.polygon(self.window.display, self.color, [

@@ -1,17 +1,16 @@
 # Imports
-from src.classes.Button import Button
-import pandas_market_calendars as mcal
 import datetime as dt
-from bs4 import BeautifulSoup
-import requests
-from os.path import exists
-from src.classes.File import File
+import os
 from time import sleep
+import pandas_market_calendars as mcal
+import requests
+from bs4 import BeautifulSoup
+from src.classes.DataFile import DataFile
 
 # Generates meta data
 def generateMeta(predictionsData):
 
-    meta = {}
+    
 
     # Fetches last update date
     invalidDate = False
@@ -32,18 +31,18 @@ def generateMeta(predictionsData):
         lastTD = lastTD.to_pydatetime().date()
         invalidDate = not (lastUpdate >= lastTD)
 
-    meta["validDate"] = not invalidDate
-    meta["updateDate"] = predictionsData.get("lastUpdate")
-
-    return meta
+    return {
+        "validDate": not invalidDate,
+        "updateDate": predictionsData.get("lastUpdate"),
+    }
 
 # Collects missing data
-def dataCollection(settings):
+def collectData(settings):
 
     # Loads data avoiding update errors
-    predictionsData = File("data/predictions.datcs")
+    predictionsData = DataFile("data/predictions.datcs")
     while predictionsData.data == {}:
-        predictionsData = File("data/predictions.datcs")
+        predictionsData = DataFile("data/predictions.datcs")
 
     # Determines if an update is even necessary
     meta = generateMeta(predictionsData)
@@ -59,7 +58,7 @@ def dataCollection(settings):
                 # Saves updated tickers list locally as backup
                 tickers = fetchCollection(collection)
                 with open(f"data/collections/{settings.get('collectionNames')[collection]}.datcs", "w") as file:
-                    file.write("tickers::" + str(tickers))
+                    file.write(f"tickers::{str(tickers)}")
 
                 # Adds ticker to composite if not 
                 for ticker in tickers:
@@ -75,7 +74,8 @@ def dataCollection(settings):
             # Loads tickers locally
             for collection in settings.get("collections"):
 
-                for ticker in File(f"data/collections/{settings.get('collectionNames')[collection]}.datcs").get("tickers"):
+                for ticker in DataFile(
+                f"data/collections/{settings.get('collectionNames')[collection]}.datcs").get("tickers"):
                     if ticker not in composite:
                         composite.append(ticker)
         
@@ -83,15 +83,27 @@ def dataCollection(settings):
         for num, ticker in enumerate(composite):
 
             # Loads data avoiding update errors
-            predictionsData = File("data/predictions.datcs")
+            predictionsData = DataFile("data/predictions.datcs")
             while predictionsData.data == {}:
-                predictionsData = File("data/predictions.datcs")
+                predictionsData = DataFile("data/predictions.datcs")
 
+            # Prints current progress
             predictionsData.set("loadingMessage",
             f"Fetching {ticker} ({num+1}/{len(composite)} - {((num+1)/len(composite))*100:.2f}%)")
             predictionsData.save()
 
-            sleep(0.1)
+            if os.path.exists(f"data/prices/{ticker}"):
+                pass
+            else:
+                os.makedirs(f"data/prices/{ticker}")
+
+# Builds models used for predictions
+def buildModels(settings):
+    pass
+
+# Makes predictions using generated models
+def makePredictions(settings):
+    pass
 
 # Fetches one of the available collections
 def fetchCollection(id):
@@ -107,7 +119,7 @@ def fetchCollection(id):
         ("https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average", 1, 1),
         ("https://en.wikipedia.org/wiki/Dow_Jones_Transportation_Average", 0, 0),
         ("https://en.wikipedia.org/wiki/Dow_Jones_Utility_Average", 1, 0),
-        
+
         ("https://en.wikipedia.org/wiki/Nasdaq-100", 4, 1),
         ("https://en.wikipedia.org/wiki/Russell_1000_Index", 2, 1)
     ]
@@ -124,7 +136,7 @@ def fetchCollection(id):
         tickerRow = row.find_all("td")
         if len(tickerRow) < 2: continue
         tickerRow = tickerRow[collections[id][2]]
-        if tickerRow == None: continue
+        if tickerRow is None: continue
         ticker = tickerRow.text.strip()
         if not ticker.isalpha(): continue
         tickers.append(ticker)

@@ -2,7 +2,7 @@
 import os
 
 # Handles datcs format files
-class File:
+class DataFile:
 
     # Constructor
     def __init__(self, path):
@@ -12,16 +12,16 @@ class File:
 
         # Fetches existing file data
         if os.path.exists(self.path):
-           with open(self.path, "r") as file:
+            with open(self.path, "r") as file:
 
 
-                for line in file.readlines():
-
+                for line in file:
+                    
                     # Line is reading a string
                     if "\"" in line:
                         line = line.split("\"")
                         self.data[line[0].strip().split("::")[0]] = f"{line[1]}"
-                    
+
                     else:
 
                         # Cleans up line of data
