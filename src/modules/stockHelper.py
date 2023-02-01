@@ -1,16 +1,15 @@
 # Imports
-import datetime as dt
-import os
-from time import sleep
-import pandas_market_calendars as mcal
-import requests
 from bs4 import BeautifulSoup
 from src.classes.DataFile import DataFile
+import pandas_market_calendars as mcal
+import datetime as dt
+from time import sleep
+import yfinance as yf
+import requests
+import os
 
 # Generates meta data
 def generateMeta(predictionsData):
-
-    
 
     # Fetches last update date
     invalidDate = False
@@ -80,7 +79,7 @@ def collectData(settings):
                         composite.append(ticker)
         
         # Updates collected tickers' data
-        for num, ticker in enumerate(composite):
+        for num, ticker in enumerate(composite[:10]):
 
             # Loads data avoiding update errors
             predictionsData = DataFile("data/predictions.datcs")
@@ -95,7 +94,22 @@ def collectData(settings):
             if os.path.exists(f"data/prices/{ticker}"):
                 pass
             else:
+
                 os.makedirs(f"data/prices/{ticker}")
+                today = dt.datetime.today().strftime("%Y-%m-%d:%M-%H")
+                stock = yf.Ticker(ticker)
+
+                for time in [["1m", "7d"], ["5m", "60d"], ["15m", "60d"],
+                ["1h", "730d"], ["1d", "max"], ["1wk", "max"]]:
+
+                    fileName = f"{ticker}_{time[0]}_{time[1]}.price"
+                    fileContent = today + "\n"
+
+                    history = stock.history(interval=time[0], period=time[1])
+                    
+                    # Writes collected file content
+                    with open(f"data/prices/{ticker}/{fileName}", "w") as file:
+                        file.write(fileContent)
 
 # Builds models used for predictions
 def buildModels(settings):
