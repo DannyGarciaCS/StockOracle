@@ -191,8 +191,8 @@ def handleUI(window, settings, ui, position, pressed, released, meta):
     for hint in ui["hints"]: hint.update(position, ui["blocked"])
 
     # Handles navigation buttons
-    if ui["buttons"][0].send: pass
-    if ui["buttons"][1].send: pass
+    # if ui["buttons"][0].send: pass
+    # if ui["buttons"][1].send: pass
     if ui["buttons"][3].send: return True, "settings"
     if ui["buttons"][4].send: return False, "NA"
 

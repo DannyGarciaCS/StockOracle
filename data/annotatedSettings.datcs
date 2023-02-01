@@ -35,6 +35,6 @@ TXTtitle::30
 
 # Prediction settings
 collectionNames::['SNP400', 'SNP500', 'SNP600', 'DOWINDUSTRIAL', 'DOWTRANSPORTATION', 'DOWUTILITY', 'NASDAQ100', 'RUSSELL1000']
-collections::[1, 2]
+collections::[3]
 
 debug::False

@@ -207,8 +207,8 @@ def handleUI(window, settings, ui, position, pressed, released):
         sliders=False, dropdowns=True, text=False, misc=False)["dropdowns"]
 
     # Handles buttons
-    if ui["buttons"][0].send: pass
-    if ui["buttons"][1].send: pass
+    # if ui["buttons"][0].send: pass
+    # if ui["buttons"][1].send: pass
     if ui["buttons"][2].send: return True, "predictions"
     if ui["buttons"][4].send: return False, "NA"
 

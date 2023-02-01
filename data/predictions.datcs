@@ -1,4 +1,4 @@
 lastUpdate::"13/01/2023"
 loadingTitle::"Updating data"
-loadingMessage::"Fetching ticker list"
-finishedUpdating::True
+loadingMessage::"Fetching CRM (23/30 - 76.67%)"
+finishedUpdating::False

@@ -18,22 +18,24 @@ def generateMeta(predictionsData):
     except ValueError: invalidDate = True
 
     # Update date provided is valid
-    if not invalidDate:
-
-        nyse = mcal.get_calendar("NYSE")
-        today = dt.date.today()
-        dateRange = dt.timedelta(14)
-        start = today - dateRange
-
-        # Last trading day
-        lastTD = nyse.valid_days(start_date=start.strftime("%Y-%m-%d"), end_date=today.strftime("%Y-%m-%d"))[-1]
-        lastTD = lastTD.to_pydatetime().date()
-        invalidDate = not (lastUpdate >= lastTD)
-
+    if not invalidDate: invalidDate = lastTradingDay(lastUpdate)
     return {
         "validDate": not invalidDate,
         "updateDate": predictionsData.get("lastUpdate"),
     }
+
+# Determines if the given date is was the last trading day
+def lastTradingDay(date):
+
+    nyse = mcal.get_calendar("NYSE")
+    today = dt.date.today()
+    dateRange = dt.timedelta(14)
+    start = today - dateRange
+
+    # Last trading day
+    lastTD = nyse.valid_days(start_date=start.strftime("%Y-%m-%d"), end_date=today.strftime("%Y-%m-%d"))[-1]
+    lastTD = lastTD.to_pydatetime().date()
+    return not (date >= lastTD)
 
 # Collects missing data
 def collectData(settings):
@@ -43,43 +45,13 @@ def collectData(settings):
     while predictionsData.data == {}:
         predictionsData = DataFile("data/predictions.datcs")
 
-    # Determines if an update is even necessary
+    # Updates data if necessary
     meta = generateMeta(predictionsData)
     if not meta["validDate"]:
+        composite = buildCollection(settings)
 
-        composite = []
-
-        # Tries fetching list from website
-        try:
-
-            for collection in settings.get("collections"):
-
-                # Saves updated tickers list locally as backup
-                tickers = fetchCollection(collection)
-                with open(f"data/collections/{settings.get('collectionNames')[collection]}.datcs", "w") as file:
-                    file.write(f"tickers::{str(tickers)}")
-
-                # Adds ticker to composite if not 
-                for ticker in tickers:
-                    if ticker not in composite:
-                        composite.append(ticker)
-
-        except Exception as error:
-
-            # Warning
-            print("Warning: Failed to load ticker list. Using local backup.")
-            print(f"Triggered by: {error}")
-
-            # Loads tickers locally
-            for collection in settings.get("collections"):
-
-                for ticker in DataFile(
-                f"data/collections/{settings.get('collectionNames')[collection]}.datcs").get("tickers"):
-                    if ticker not in composite:
-                        composite.append(ticker)
-        
         # Updates collected tickers' data
-        for num, ticker in enumerate(composite[:10]):
+        for num, ticker in enumerate(composite[:1]):
 
             # Loads data avoiding update errors
             predictionsData = DataFile("data/predictions.datcs")
@@ -91,25 +63,83 @@ def collectData(settings):
             f"Fetching {ticker} ({num+1}/{len(composite)} - {((num+1)/len(composite))*100:.2f}%)")
             predictionsData.save()
 
-            if os.path.exists(f"data/prices/{ticker}"):
-                pass
-            else:
+            if os.path.exists(f"data/prices/{ticker}"): updateTicker(ticker)
+            else: initializeTicker(ticker)
 
-                os.makedirs(f"data/prices/{ticker}")
-                today = dt.datetime.today().strftime("%Y-%m-%d:%M-%H")
-                stock = yf.Ticker(ticker)
+# Builds ticker collection
+def buildCollection(settings):
 
-                for time in [["1m", "7d"], ["5m", "60d"], ["15m", "60d"],
-                ["1h", "730d"], ["1d", "max"], ["1wk", "max"]]:
+    composite = []
 
-                    fileName = f"{ticker}_{time[0]}_{time[1]}.price"
-                    fileContent = today + "\n"
+    # Tries fetching list from website
+    try:
 
-                    history = stock.history(interval=time[0], period=time[1])
-                    
-                    # Writes collected file content
-                    with open(f"data/prices/{ticker}/{fileName}", "w") as file:
-                        file.write(fileContent)
+        for collection in settings.get("collections"):
+
+            # Saves updated tickers list locally as backup
+            tickers = fetchCollection(collection)
+            with open(f"data/collections/{settings.get('collectionNames')[collection]}.datcs", "w") as file:
+                file.write(f"tickers::{str(tickers)}")
+
+            # Adds ticker to composite if not 
+            for ticker in tickers:
+                if ticker not in composite:
+                    composite.append(ticker)
+
+    except Exception as error:
+
+        # Warning
+        print("Warning: Failed to load ticker list. Using local backup.")
+        print(f"Triggered by: {error}")
+
+        # Loads tickers locally
+        for collection in settings.get("collections"):
+
+            for ticker in DataFile(
+            f"data/collections/{settings.get('collectionNames')[collection]}.datcs").get("tickers"):
+                if ticker not in composite:
+                    composite.append(ticker)
+    
+    return composite
+
+# Updates an already existing ticker
+def updateTicker(ticker):
+    pass
+                
+# Builds ticker from scratch
+def initializeTicker(ticker):
+
+    # Fetches build data
+    os.makedirs(f"data/prices/{ticker}")
+    stock = yf.Ticker(ticker)
+
+    # Loops over available time
+    for time in [["1m", "7d"], ["5m", "60d"], ["15m", "60d"],
+    ["1h", "730d"], ["1d", "max"], ["1wk", "max"]]:
+
+        fileName = f"{ticker}_{time[0]}_{time[1]}.price"
+        fileContent = ""
+
+        try:
+
+            # Fetches entries
+            history = stock.history(interval=time[0], period=time[1])
+            indices = history.index.tolist()
+            values = history.get(["High", "Low", "Volume"]).values.tolist()
+
+            # Formats entries
+            for entry in range(len(indices)):
+                fileContent += f"{str(indices[entry])}::{str(values[entry])}\n"
+
+        # There was an error loading the data (ticker will be ignored for predictions)
+        except Exception as error:
+
+            print(f"Error loading data: {error}")
+            fileContent = "NA"
+
+        # Writes collected file content
+        with open(f"data/prices/{ticker}/{fileName}", "w") as file:
+            file.write(fileContent)
 
 # Builds models used for predictions
 def buildModels(settings):
