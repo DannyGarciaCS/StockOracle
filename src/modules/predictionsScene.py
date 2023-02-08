@@ -2,7 +2,7 @@
 from src.classes.DataFile import DataFile
 from src.classes.Button import Button
 from src.classes.Hint import Hint
-import src.modules.stockHelper as sh
+import src.modules.build as build
 import pygame as pg
 
 # Initializes predictions scene
@@ -11,7 +11,7 @@ def boot(window, settings):
     # Scene variables
     clock = pg.time.Clock()
     predictionsData = DataFile("data/predictions.datcs")
-    meta = sh.generateMeta(predictionsData)
+    meta = build.generateMeta(predictionsData)
     ui = generateUI(window, settings, meta)
 
     # Main scene loop

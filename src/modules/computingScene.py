@@ -1,6 +1,6 @@
 # Imports
 from multiprocessing import Process
-import src.modules.stockHelper as sh
+import src.modules.build as build
 from src.classes.DataFile import DataFile
 import pygame as pg
 
@@ -55,9 +55,9 @@ def updatePredictions(settings):
         predictionsData = DataFile("data/predictions.datcs")
 
     # Executes all stages of prediction
-    sh.collectData(settings)
-    sh.buildModels(settings)
-    sh.makePredictions(settings)
+    baseTickers, trainingTickers = build.collectData(settings)
+    build.buildModels(settings, baseTickers, trainingTickers)
+    build.makePredictions(settings)
 
     # Finishes updating
     predictionsData.set("finishedUpdating", True)
