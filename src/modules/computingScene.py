@@ -92,29 +92,37 @@ def handleUI(window, settings, ui):
     # More compact argument
     ms = settings.get("menuScale")
 
-    # Bar background
-    pg.draw.rect(window.display, settings.get("CRmenuXXD"), pg.Rect(0, 1080 / 2 - 150 * ms, 1920, 300 * ms))
-
-    # Draws loading icon
-    loadingFrame = rotateCenter(ui["misc"][1], ui["loadingFrame"])
-    window.blit(loadingFrame, (1920 / 2 - loadingFrame.get_width() / 2,
-    1080 / 2 - loadingFrame.get_height() / 2 - 40 * ms))
-    ui["loadingFrame"] += 3
-
     # Loads data avoiding update errors
     predictionsData = DataFile("data/predictions.datcs")
     while predictionsData.data == {}:
         predictionsData = DataFile("data/predictions.datcs")
 
-    # Draws loading text
+    # Updates displayed elements
     title = predictionsData.get("loadingTitle")
     message = predictionsData.get("loadingMessage")
+    titleHeight, messageHeight = ui["titleFont"].size(title)[1], ui["messageFont"].size(message)[1]
     title = ui["titleFont"].render(title, True, settings.get("CRstrokeL"))
     message = ui["messageFont"].render(message, True, settings.get("CRstrokeL"))
+    loadingFrame = rotateCenter(ui["misc"][1], ui["loadingFrame"])
+
+    # Object properties
+    warningMargin = 12 * ms
+    warningOffset = (loadingFrame.get_height() + warningMargin * 2 + titleHeight + messageHeight) / 2
+
+    loadingY = 1080 / 2 - warningOffset
+    headerY = 1080 / 2 + loadingFrame.get_height() + warningMargin - warningOffset
+    subHeaderY = 1080 / 2 + loadingFrame.get_height() + warningMargin * 2 + titleHeight - warningOffset
+
+    # Draws elements
+    pg.draw.rect(window.display, settings.get("CRmenuXXD"), pg.Rect(0, 1080 / 2 - 150 * ms, 1920, 300 * ms))
+    
+    window.blit(loadingFrame, (1920 / 2 - loadingFrame.get_width() / 2, loadingY))
+    ui["loadingFrame"] += 3
+
     window.blit(title, (1920 / 2 - ui["titleFont"].size(
-    predictionsData.get("loadingTitle"))[0] / 2, 1080 / 2 + 25 * ms))
+    predictionsData.get("loadingTitle"))[0] / 2, headerY))
     window.blit(message, (1920 / 2 - ui["messageFont"].size(
-    predictionsData.get("loadingMessage"))[0] / 2, 1080 / 2 + 65 * ms))
+    predictionsData.get("loadingMessage"))[0] / 2, subHeaderY))
 
     # Continues or quits based on prediction data
     if(predictionsData.get("finishedUpdating")): 0

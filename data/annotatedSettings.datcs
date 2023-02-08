@@ -34,7 +34,7 @@ TXTheader::24
 TXTtitle::30
 
 # Prediction settings
-collectionNames::['SNP400', 'SNP500', 'SNP600', 'DOWINDUSTRIAL', 'DOWTRANSPORTATION', 'DOWUTILITY', 'NASDAQ100', 'RUSSELL1000']
+collectionNames::['SNP400','SNP500','SNP600','DOWINDUSTRIAL','DOWTRANSPORTATION','DOWUTILITY','NASDAQ100','RUSSELL1000']
 collections::[3, 2]
 trainingCollections::[1]
 

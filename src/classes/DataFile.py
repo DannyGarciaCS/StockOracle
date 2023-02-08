@@ -13,8 +13,6 @@ class DataFile:
         # Fetches existing file data
         if os.path.exists(self.path):
             with open(self.path, "r") as file:
-
-
                 for line in file:
                     
                     # Line is reading a string

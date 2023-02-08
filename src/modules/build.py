@@ -1,21 +1,13 @@
 # Imports
 from bs4 import BeautifulSoup
 from src.classes.DataFile import DataFile
-from src.classes.PriceFile import PriceFile
 import pandas_market_calendars as mcal
 import datetime as dt
 from time import sleep
 import yfinance as yf
 import requests
+import pickle
 import os
-
-
-
-
-
-
-
-
 
 # Collects missing data
 def collectData(settings):
@@ -32,7 +24,7 @@ def collectData(settings):
         baseTickers, trainingTickers, jointTickers = buildCollection(settings)
 
         # Updates collected tickers' data
-        for num, ticker in enumerate(jointTickers[:10]):
+        for num, ticker in enumerate(jointTickers):
 
             # Loads data avoiding update errors
             predictionsData = DataFile("data/predictions.datcs")
@@ -44,75 +36,37 @@ def collectData(settings):
             f"Fetching {ticker} ({num+1}/{len(jointTickers)} - {((num+1)/len(jointTickers))*100:.2f}%)")
             predictionsData.save()
 
-            # Updates ticker if such exists and isn't corrupted
-            create = False
-            if os.path.exists(f"data/prices/{ticker}"):
-
-                # Fetches ticker prices
-                tickerPrices = [PriceFile(f"data/prices/{ticker}/{name}.price") for name in 
-                [f"{ticker}_{time[0]}_{time[1]}" for time in [["1m", "7d"], ["5m", "60d"],
-                ["15m", "60d"], ["1h", "730d"], ["1d", "max"], ["1wk", "max"]]]]
-
-                # Creates files from scratch if corrupted
-                for price in tickerPrices:
-                    if price.isCorrupted():
-                        create = True
-                        break
-
-                # Updates if there is uncorrupted data
-                if not create: updateTicker(ticker, tickerPrices)
-            else: create = True
-            
-            # Ticker does not exist or is corrupted
-            if create: initializeTicker(ticker)
+            # Initializes current ticker
+            initializeTicker(ticker)
     
     return baseTickers, trainingTickers
-
-
-
-# Updates an already existing ticker
-def updateTicker(ticker, tickerPrices):
-
-    
-    today = dt.datetime.now().strftime("%Y-%m-%d:%M-%H")
-
                 
 # Builds ticker from scratch
 def initializeTicker(ticker):
 
     # Fetches build data
-    os.makedirs(f"data/prices/{ticker}")
+    directory = f"data/prices/{ticker}"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     stock = yf.Ticker(ticker)
 
     # Loops over available time
     for time in [["1m", "7d"], ["5m", "60d"], ["15m", "60d"],
     ["1h", "730d"], ["1d", "max"], ["1wk", "max"]]:
 
-        fileName = f"{ticker}_{time[0]}_{time[1]}.price"
-        fileContent = ""
+        fileName = f"{directory}/{ticker}_{time[0]}_{time[1]}.price"
+        fileContent = []
 
-        try:
+        # Fetches data
+        history = stock.history(interval=time[0], period=time[1])
+        indices = history.index.tolist()
+        for index in range(len(indices)): indices[index] = indices[index].strftime('%Y-%m-%d:%M-%H')
+        values = history.get(["High", "Low", "Volume"]).values.tolist()
 
-            # Fetches entries
-            history = stock.history(interval=time[0], period=time[1])
-            indices = history.index.tolist()
-            values = history.get(["High", "Low", "Volume"]).values.tolist()
-
-            # Ensures data was collected
-            if not fileContent: raise ValueError("Could not find ticker data.")
-
-            # Formats entries
-            for entry in range(len(indices)):
-                fileContent += f"{str(indices[entry])}::{str(values[entry])}\n"
-
-        except Exception as error:
-
-            print(f"Error loading data: {error}")
-            fileContent = "NA"
-
-        # Writes collected file content
-        with open(f"data/prices/{ticker}/{fileName}", "w") as file:
-            file.write(fileContent)
+        # Saves data
+        fileContent.extend((indices[entry], values[entry]) for entry in range(len(indices)))
+        with open(fileName, 'wb') as file:
+            pickle.dump(fileContent, file)
 
 # Builds models used for predictions
 def buildModels(settings, baseTickers, trainingTickers):
@@ -161,9 +115,10 @@ def isLastTradingDay(date):
 def buildCollection(settings):
 
     # Initializes composites
+    jointTickers = []
     baseTickers = []
     trainingTickers = []
-    jointTickers = []
+    tickerSets = [baseTickers, trainingTickers, jointTickers]
 
     # Defines collections
     baseCollections = settings.get("collections")
@@ -171,6 +126,7 @@ def buildCollection(settings):
     jointCollection = baseCollections
     for collection in trainingCollections:
         if collection not in jointCollection: jointCollection.append(collection)
+    collectionSets = [baseCollections, trainingCollections, jointCollection]
 
     # Fetches collection tickers
     for collection in jointCollection:
@@ -182,16 +138,8 @@ def buildCollection(settings):
             tickers = fetchCollection(collection)
             with open(f"data/collections/{settings.get('collectionNames')[collection]}.datcs", "w") as file:
                 file.write(f"tickers::{str(tickers)}")
+            tickerSort(tickers, collection, collectionSets, tickerSets)
 
-            # Adds missing tickers to appropriate collections
-            for collectionSet, tickerSet in zip([baseCollections, trainingCollections, jointCollection],
-            [baseTickers, trainingTickers, jointTickers]):
-                if collection in collectionSet:
-                    for ticker in tickers:
-                        if ticker not in tickerSet:
-                            tickerSet.append(ticker)
-
-        # Was not able to fetch tickers online, using local backup
         except Exception as error:
 
             # Warning
@@ -201,16 +149,17 @@ def buildCollection(settings):
 
             # Fetches tickers list
             tickers = DataFile(f"data/collections/{settings.get('collectionNames')[collection]}.datcs").get("tickers")
+            tickerSort(tickers, collection, collectionSets, tickerSets)
 
-            # Adds missing tickers to appropriate collections
-            for collectionSet, tickerSet in zip([baseCollections, trainingCollections, jointCollection],
-            [baseTickers, trainingTickers, jointTickers]):
-                if collection in collectionSet:
-                    for ticker in tickers:
-                        if ticker not in tickerSet:
-                            tickerSet.append(ticker)
-    
     return baseTickers, trainingTickers, jointTickers
+
+# Adds missing tickers to appropriate collections
+def tickerSort(tickers, collection, collectionSets, tickerSets):
+    for collectionSet, tickerSet in zip(collectionSets, tickerSets):
+        if collection in collectionSet:
+            for ticker in tickers:
+                if ticker not in tickerSet:
+                    tickerSet.append(ticker)
 
 # Fetches one of the available collections
 def fetchCollection(id):

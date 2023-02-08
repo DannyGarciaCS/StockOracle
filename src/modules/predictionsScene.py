@@ -54,6 +54,19 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
     # More compact argument
     ms = settings.get("menuScale")
 
+    # Object properties
+    header = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
+    headerBlack = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTheader") * ms))
+    warningSizes = [header.size("Do you want to update the data and make new predictions?"),
+    header.size("This might take some time.")]
+    
+    warningMargin = 12 * ms
+    warningOffset = (warningSizes[0][1] + 2 * warningMargin + warningSizes[1][1] + 40 * ms) / 2
+
+    headerY = 1080 / 2 - warningOffset
+    subHeaderY = 1080 / 2 + warningSizes[0][1] + warningMargin - warningOffset
+    buttonY = 1080 / 2 + warningSizes[0][1] + 2 * warningMargin + warningSizes[1][1] - warningOffset
+
     ui = {"blocked": False}
     if buttons:
         ui["buttons"] = [
@@ -73,16 +86,16 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             iconBase="media/exitIconBase.png", iconHighlight="media/exitIconHighlight.png",
             iconClick="media/exitIconClick.png", iconSize=(55 * ms, 55 * ms)),
 
-            Button(window, (1920 - 245 * ms, 1080 / 2 + 35 * ms), (210 * ms, 41 * ms), drawText=True,
+            Button(window, (1920 - 245 * ms, 1080 / 2 + 35 * ms), (210 * ms, 40 * ms), drawText=True,
             text="Build Predictions", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
             colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
             colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms)),
 
-            Button(window, (1920 / 2 - 230 * ms, 1080 / 2 + 20 * ms), (220 * ms, 41 * ms), drawText=True,
+            Button(window, (1920 / 2 - 230 * ms, buttonY), (220 * ms, 40 * ms), drawText=True,
             text="Yes", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
             colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
             colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms)),
-            Button(window, (1920 / 2 + 10 * ms, 1080 / 2 + 20 * ms), (220 * ms, 41 * ms), drawText=True,
+            Button(window, (1920 / 2 + 10 * ms, buttonY), (220 * ms, 40 * ms), drawText=True,
             text="No", textSize=round(settings.get("TXTread") * ms), textColor=settings.get("CRstrokeL"),
             colorBase=settings.get("CRmenuD"), colorHighlight=settings.get("CRmenuXL"),
             colorClick=settings.get("CRmenuXD"), borderRadius=round(50 * ms))
@@ -90,10 +103,6 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
 
     # Generates batch of text
     if text:
-        header = pg.font.Font("media/latoBold.ttf", round(settings.get("TXTheader") * ms))
-        headerBlack = pg.font.Font("media/latoBlack.ttf", round(settings.get("TXTheader") * ms))
-        warningSizes = [header.size("Do you want to update the data and make new predictions?"),
-        header.size("This might take some time.")]
         ui["text"] = [
             (header.render("Ticker", True, settings.get("CRstrokeL")), (145 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Price", True, settings.get("CRstrokeL")), (255 * ms, 1080 / 2 + 41 * ms)),
@@ -106,9 +115,9 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             (1920 - 390 * ms, 1080 / 2 + 41 * ms)),
 
             (header.render("Do you want to update the data and make new predictions?", True,
-            settings.get("CRstrokeL")), (1920 / 2 - warningSizes[0][0] / 2, 1080 / 2 - warningSizes[0][1] - 30 * ms)),
+            settings.get("CRstrokeL")), (1920 / 2 - warningSizes[0][0] / 2, headerY)),
             (header.render("This might take some time.", True, settings.get("CRstrokeL")),
-            (1920 / 2 - warningSizes[1][0] / 2, 1080 / 2 - warningSizes[1][1]))
+            (1920 / 2 - warningSizes[1][0] / 2, subHeaderY))
         ]
 
     # Generates batch of hints
