@@ -20,8 +20,11 @@ CRhighlightD::(40, 85, 235)
 TXTtitle::30
 TXTheader::24
 debug::False
-collections::[3, 2]
+collections::[3]
 CRshadow::(30, 30, 30, 220)
 CRmenuXXD::(20, 20, 20)
 collectionNames::['SNP400', 'SNP500', 'SNP600', 'DOWINDUSTRIAL', 'DOWTRANSPORTATION', 'DOWUTILITY', 'NASDAQ100', 'RUSSELL1000']
-trainingCollections::[1]
+trainingCollections::[3]
+fastMode::False
+threadLimit::100
+safeMode::False

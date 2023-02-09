@@ -3,11 +3,14 @@ from bs4 import BeautifulSoup
 from src.classes.DataFile import DataFile
 import pandas_market_calendars as mcal
 import datetime as dt
-from time import sleep
+import multiprocessing
 import yfinance as yf
 import requests
+import threading
 import pickle
 import os
+from time import sleep
+import glob
 
 # Collects missing data
 def collectData(settings):
@@ -21,26 +24,77 @@ def collectData(settings):
     meta = generateMeta(predictionsData)
     if not meta["validDate"]:
 
+        # Deletes all stored price data
+        files = glob.glob("data/prices/*")
+        for file in files:
+            os.remove(file)
+
+        # Splits work amongst different usable processors
         baseTickers, trainingTickers, jointTickers = buildCollection(settings)
+        usableCPU = multiprocessing.cpu_count() - 1
+        if settings.get("safeMode"): usableCPU -= 1
 
-        # Updates collected tickers' data
-        for num, ticker in enumerate(jointTickers):
+        if usableCPU > 1:
 
-            # Loads data avoiding update errors
-            predictionsData = DataFile("data/predictions.datcs")
-            while predictionsData.data == {}:
-                predictionsData = DataFile("data/predictions.datcs")
+            # Generates multiprocessing ticker batches
+            overflow = False
+            batchSize = len(jointTickers) / usableCPU
+            if type(batchSize) != int:
+                batchSize = int(batchSize)
+                overflow = True
+            tickerBatches = [jointTickers[tick:tick + batchSize] for tick in range(0, len(jointTickers), batchSize)]
 
-            # Prints current progress
-            predictionsData.set("loadingMessage",
-            f"Fetching {ticker} ({num+1}/{len(jointTickers)} - {((num+1)/len(jointTickers))*100:.2f}%)")
-            predictionsData.save()
+            # Equals stack of tickers to processors
+            if overflow:
+                extra = tickerBatches.pop(-1)
+                tickerBatches[-1] += extra
 
-            # Initializes current ticker
-            initializeTicker(ticker)
-    
+        else: tickerBatches = [jointTickers]
+        count = len(jointTickers)
+
+        # Starts main threads
+        threads = [threading.Thread(target=updateProgress, args=(count, )),
+        threading.Thread(target=handleStack, args=(tickerBatches[0], ))]
+        for thread in threads: thread.start()
+
+        # Starts processes
+        processes = []
+        for processID in range(len(tickerBatches) - 1):
+
+            process = multiprocessing.Process(target=handleStack, args=(tickerBatches[processID + 1],))
+            processes.append(process)
+            process.start()
+
+        # Waits for updates to finish
+        for thread in threads: thread.join()
+        for process in processes: process.join()
+
     return baseTickers, trainingTickers
-                
+
+# Updates progress status 
+def updateProgress(count):
+
+    # Continues searching until we have all tickers
+    found = len(next(os.walk("data/prices"))[1])
+    while found < count:
+        found = len(next(os.walk("data/prices"))[1])
+
+        # Loads data avoiding update errors
+        predictionsData = DataFile("data/predictions.datcs")
+        while predictionsData.data == {}:
+            predictionsData = DataFile("data/predictions.datcs")
+
+        # Prints current progress
+        predictionsData.set("loadingMessage",
+        f"Fetched {found}/{count} tickers ({(found/count) * 100:.2f}%)")
+        predictionsData.save()
+        sleep(0.2)
+
+# Initializes a stack of tickers
+def handleStack(stack):
+    for ticker in stack:
+        initializeTicker(ticker)
+
 # Builds ticker from scratch
 def initializeTicker(ticker):
 

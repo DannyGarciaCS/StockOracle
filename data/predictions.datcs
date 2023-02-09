@@ -1,4 +1,4 @@
 lastUpdate::"13/01/2023"
 loadingTitle::"Updating data"
-loadingMessage::"Fetching GS (11/1101 - 1.00%)"
-finishedUpdating::False
+loadingMessage::"Fetching ticker list"
+finishedUpdating::True
