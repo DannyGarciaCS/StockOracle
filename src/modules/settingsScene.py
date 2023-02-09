@@ -1,10 +1,12 @@
 # Imports
-from sys import exit
 from src.classes.Button import Button
 from src.classes.Hint import Hint
 from src.classes.Toggle import Toggle
 from src.classes.Slider import Slider
 from src.classes.Dropdown import Dropdown
+
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 
 # Initializes predictions scene

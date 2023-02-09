@@ -20,56 +20,65 @@ def collectData(settings):
     while predictionsData.data == {}:
         predictionsData = DataFile("data/predictions.datcs")
 
+    # Splits work amongst different usable processors
+    baseTickers, trainingTickers, jointTickers = buildCollection(settings)
+
     # Updates data if necessary
-    meta = generateMeta(predictionsData)
-    if not meta["validDate"]:
+    if not isLastTradingDay(predictionsData.get("dataUpdate")):
+        resetData(jointTickers, settings)
 
-        # Deletes all stored price data
-        files = glob.glob("data/prices/*")
-        for file in files:
-            os.remove(file)
-
-        # Splits work amongst different usable processors
-        baseTickers, trainingTickers, jointTickers = buildCollection(settings)
-        usableCPU = multiprocessing.cpu_count() - 1
-        if settings.get("safeMode"): usableCPU -= 1
-
-        if usableCPU > 1:
-
-            # Generates multiprocessing ticker batches
-            overflow = False
-            batchSize = len(jointTickers) / usableCPU
-            if type(batchSize) != int:
-                batchSize = int(batchSize)
-                overflow = True
-            tickerBatches = [jointTickers[tick:tick + batchSize] for tick in range(0, len(jointTickers), batchSize)]
-
-            # Equals stack of tickers to processors
-            if overflow:
-                extra = tickerBatches.pop(-1)
-                tickerBatches[-1] += extra
-
-        else: tickerBatches = [jointTickers]
-        count = len(jointTickers)
-
-        # Starts main threads
-        threads = [threading.Thread(target=updateProgress, args=(count, )),
-        threading.Thread(target=handleStack, args=(tickerBatches[0], ))]
-        for thread in threads: thread.start()
-
-        # Starts processes
-        processes = []
-        for processID in range(len(tickerBatches) - 1):
-
-            process = multiprocessing.Process(target=handleStack, args=(tickerBatches[processID + 1],))
-            processes.append(process)
-            process.start()
-
-        # Waits for updates to finish
-        for thread in threads: thread.join()
-        for process in processes: process.join()
+    # Saves date of update
+    today = dt.date.today().strftime("%d-%m-%Y")
+    predictionsData.set("dataUpdate", today)
+    predictionsData.save()
 
     return baseTickers, trainingTickers
+
+# Resets stored ticker data with new one
+def resetData(jointTickers, settings):
+
+    # Deletes all stored price data
+    files = glob.glob("data/prices/*")
+    for file in files:
+        os.remove(file)
+
+    count = len(jointTickers)
+    usableCPU = multiprocessing.cpu_count() - 1
+    if settings.get("safeMode"): usableCPU -= 1
+
+    if usableCPU > 1 and count > usableCPU:
+
+        # Generates multiprocessing ticker batches
+        overflow = False
+        batchSize = len(jointTickers) / usableCPU
+        if type(batchSize) != int:
+            batchSize = int(batchSize)
+            overflow = True
+        tickerBatches = [jointTickers[tick:tick + batchSize] for tick in range(0, len(jointTickers), batchSize)]
+
+        # Equals stack of tickers to processors
+        if overflow:
+            extra = tickerBatches.pop(-1)
+            tickerBatches[-1] += extra
+
+    else: tickerBatches = [jointTickers]
+
+    # Starts main threads
+    threads = [threading.Thread(target=updateProgress, args=(count, )),
+    threading.Thread(target=handleStack, args=(settings, tickerBatches[0], ))]
+    for thread in threads: thread.start()
+
+    # Starts processes
+    processes = []
+    for processID in range(len(tickerBatches) - 1):
+
+        process = multiprocessing.Process(target=handleStack, args=(settings, tickerBatches[processID + 1],))
+        processes.append(process)
+        process.start()
+
+    # Waits for updates to finish
+    for thread in threads: thread.join()
+    for process in processes: process.join()
 
 # Updates progress status 
 def updateProgress(count):
@@ -91,9 +100,12 @@ def updateProgress(count):
         sleep(0.2)
 
 # Initializes a stack of tickers
-def handleStack(stack):
+def handleStack(settings, stack):
+
+    ### Implemented multithreading solution here, but rate of download was too fast and locked database
+    ### Will only do multiprocessing, no multithreading for data fetching
     for ticker in stack:
-        initializeTicker(ticker)
+            initializeTicker(ticker)
 
 # Builds ticker from scratch
 def initializeTicker(ticker):
@@ -114,7 +126,7 @@ def initializeTicker(ticker):
         # Fetches data
         history = stock.history(interval=time[0], period=time[1])
         indices = history.index.tolist()
-        for index in range(len(indices)): indices[index] = indices[index].strftime('%Y-%m-%d:%M-%H')
+        for index in range(len(indices)): indices[index] = indices[index].strftime("%d-%m-%Y:%M-%H")
         values = history.get(["High", "Low", "Volume"]).values.tolist()
 
         # Saves data
@@ -124,36 +136,26 @@ def initializeTicker(ticker):
 
 # Builds models used for predictions
 def buildModels(settings, baseTickers, trainingTickers):
-    pass
+    
+    # Loads data avoiding update errors
+    predictionsData = DataFile("data/predictions.datcs")
+    while predictionsData.data == {}:
+        predictionsData = DataFile("data/predictions.datcs")
+    
+
 
 # Makes predictions using generated models
 def makePredictions(settings):
     pass
 
-
-
-
-
-
-
-# Generates meta data
-def generateMeta(predictionsData):
-
-    # Fetches last update date
-    invalidDate = False
-    lastUpdate = predictionsData.get("lastUpdate")
-    try: lastUpdate = dt.datetime.strptime(lastUpdate, "%d/%m/%Y").date()
-    except ValueError: invalidDate = True
-
-    # Update date provided is valid
-    if not invalidDate: invalidDate = isLastTradingDay(lastUpdate)
-    return {
-        "validDate": not invalidDate,
-        "updateDate": predictionsData.get("lastUpdate"),
-    }
-
 # Determines if the given date is was the last trading day
 def isLastTradingDay(date):
+
+    # Handles string inputs
+    if type(date)==str:
+        date = "".join(date.split("/"))
+        date = "".join(date.split("-"))
+        date = dt.datetime.strptime(date, "%d%m%Y").date()
 
     nyse = mcal.get_calendar("NYSE")
     today = dt.date.today()
@@ -163,7 +165,7 @@ def isLastTradingDay(date):
     # Last trading day
     lastTD = nyse.valid_days(start_date=start.strftime("%Y-%m-%d"), end_date=today.strftime("%Y-%m-%d"))[-1]
     lastTD = lastTD.to_pydatetime().date()
-    return not (date >= lastTD)
+    return date >= lastTD
 
 # Builds ticker collection
 def buildCollection(settings):

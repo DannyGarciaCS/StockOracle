@@ -3,6 +3,9 @@ from src.classes.DataFile import DataFile
 from src.classes.Button import Button
 from src.classes.Hint import Hint
 import src.modules.build as build
+
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 
 # Initializes predictions scene
@@ -11,8 +14,7 @@ def boot(window, settings):
     # Scene variables
     clock = pg.time.Clock()
     predictionsData = DataFile("data/predictions.datcs")
-    meta = build.generateMeta(predictionsData)
-    ui = generateUI(window, settings, meta)
+    ui = generateUI(window, settings, predictionsData)
 
     # Main scene loop
     while True:
@@ -28,7 +30,7 @@ def boot(window, settings):
             if event.type == pg.MOUSEBUTTONUP: released = event.button
 
         # Updates window
-        response = handleUI(window, settings, ui, position, pressed, released, meta)
+        response = handleUI(window, settings, ui, position, pressed, released, predictionsData)
         if response != 1: return response
         window.update()
         window.fill(settings.get("CRmenuD"))
@@ -49,7 +51,7 @@ def getMouse(window):
     return position, pressed, released
 
 # Generates ui elements
-def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
+def generateUI(window, settings, predictionsData, buttons=True, text=True, hints=True):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -67,7 +69,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
     subHeaderY = 1080 / 2 + warningSizes[0][1] + warningMargin - warningOffset
     buttonY = 1080 / 2 + warningSizes[0][1] + 2 * warningMargin + warningSizes[1][1] - warningOffset
 
-    ui = {"blocked": False}
+    ui = {"blocked": False, "updated": "CRgood" if build.isLastTradingDay(predictionsData.get("modelUpdate")) else "CRbad"}
     if buttons:
         ui["buttons"] = [
             Button(window, (5 * ms, 5 * ms), (90 * ms, 90 * ms), drawIcon=True, drawBackground=False,
@@ -111,7 +113,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
             (header.render("Diff", True, settings.get("CRstrokeL")), (585 * ms, 1080 / 2 + 41 * ms)),
             (header.render("Acc (?)", True, settings.get("CRstrokeL")), (695 * ms, 1080 / 2 + 41 * ms)),
 
-            (headerBlack.render(meta["updateDate"], True, settings.get("CRgood" if meta["validDate"] else "CRbad")),
+            (headerBlack.render(predictionsData.get("modelUpdate"), True, settings.get(ui["updated"])),
             (1920 - 390 * ms, 1080 / 2 + 41 * ms)),
 
             (header.render("Do you want to update the data and make new predictions?", True,
@@ -156,7 +158,7 @@ def generateUI(window, settings, meta, buttons=True, text=True, hints=True):
     return ui
 
 # Handles input and visualization
-def handleUI(window, settings, ui, position, pressed, released, meta):
+def handleUI(window, settings, ui, position, pressed, released, predictionsData):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -190,9 +192,7 @@ def handleUI(window, settings, ui, position, pressed, released, meta):
     (675 * ms, 1080 / 2 + 85 * ms), (675 * ms, 1080 - 26 * ms), round(4 * ms))
     pg.draw.line(window.display, settings.get("CRmenuL"),
     (785 * ms, 1080 / 2 + 85 * ms), (785 * ms, 1080 - 26 * ms), round(4 * ms))
-
-    pg.draw.circle(window.display, settings.get("CRgood" if meta["validDate"] else "CRbad"),
-    (1920 - 415 * ms, 1080 / 2 + 56 * ms), 9 * ms)
+    pg.draw.circle(window.display, settings.get(ui["updated"]), (1920 - 415 * ms, 1080 / 2 + 56 * ms), 9 * ms)
 
     # Draws custom non-warning elements
     for text in ui["text"][:-2]: window.blit(*text)

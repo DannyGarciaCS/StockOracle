@@ -2,6 +2,9 @@
 from multiprocessing import Process
 import src.modules.build as build
 from src.classes.DataFile import DataFile
+
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 
 # Initializes predictions scene

@@ -1,4 +1,5 @@
-lastUpdate::"13/01/2023"
+dataUpdate::"13/01/2023"
+modelUpdate::"13/01/2023"
 loadingTitle::"Updating data"
-loadingMessage::"Fetching ticker list"
-finishedUpdating::True
+loadingMessage::"Fetched 4/1502 tickers (0.27%)"
+finishedUpdating::False
