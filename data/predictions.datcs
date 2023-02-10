@@ -1,5 +1,5 @@
-dataUpdate::"13/01/2023"
+dataUpdate::"26/01/2023"
 modelUpdate::"13/01/2023"
-loadingTitle::"Updating data"
-loadingMessage::"Fetching ticker list"
+loadingTitle::"Building Model"
+loadingMessage::"Generating training data"
 finishedUpdating::True

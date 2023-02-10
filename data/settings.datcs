@@ -28,3 +28,4 @@ trainingCollections::[3]
 fastMode::False
 threadLimit::10
 safeMode::False
+periodLimits::[300, 150, 300, 30, 30, 150, 40]

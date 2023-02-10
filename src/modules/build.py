@@ -100,7 +100,7 @@ def handleStack(settings, stack):
     ### Implemented multithreading solution here, but rate of download was too fast and locked database
     ### Will only do multiprocessing, no multithreading for data fetching
     for ticker in stack:
-            initializeTicker(ticker)
+        initializeTicker(ticker)
 
 # Builds ticker from scratch
 def initializeTicker(ticker):
@@ -139,8 +139,60 @@ def initializeTicker(ticker):
 def buildModels(settings, baseTickers, trainingTickers):
     
     predictionsData = safeLoad("data/predictions.datcs")
-    
+    predictionsData.set("loadingTitle", "Building Model")
+    predictionsData.set("loadingMessage", "Generating training data")
+    predictionsData.save()
 
+
+
+
+
+    periodLimits = settings.get("periodLimits")
+
+    for day in range(1):
+
+        end = dt.datetime.now() - dt.timedelta(days=day)
+        dayCompilation = formattedPrices(["AAPL", "AXP"], periodLimits, end)
+        print(len(dayCompilation))
+
+# Returns prices of tickers relevant to predictions
+def formattedPrices(tickers, periodLimits, end):
+    
+    finalCompilation = []
+    for ticker in tickers:
+        localCompilation = []
+
+        # Loops over defined files
+        for period in [["1m", periodLimits[0]], ["5m", periodLimits[1]], ["15m", periodLimits[2]],
+        ["1h", periodLimits[3]], ["1h", periodLimits[4]], ["1d", periodLimits[5]], ["1wk", periodLimits[6]]]:
+        
+            with open(f"data/prices/{ticker}/{ticker}_{period[0]}.price", "rb") as file:
+                
+                # Initializes file data
+                data = pickle.load(file)
+                maxLength = period[1]
+                length = 0
+
+                # Loops over file
+                for line in data[::-1]:
+
+                    # Reached value limit
+                    date = dt.datetime.strptime(line[0], "%d-%m-%Y:%M-%H")
+                    if length == maxLength: break
+
+                    # Adds fetched value
+                    elif date <= end:
+                        localCompilation.append(line[1])
+                        length += 1
+        
+        # Invalidates training compilation if there is insufficient data
+        if len(localCompilation) != sum(periodLimits):
+            finalCompilation = None
+            break
+        
+        # Add data if there were no issues
+        finalCompilation += localCompilation
+    return finalCompilation
 
 # Makes predictions using generated models
 def makePredictions(settings):

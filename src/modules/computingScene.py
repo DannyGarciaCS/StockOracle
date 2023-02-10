@@ -24,7 +24,7 @@ def boot(window, settings):
         predictionsData = DataFile("data/predictions.datcs")
 
     # Initializes predictions data
-    predictionsData.set("loadingTitle", "Updating data")
+    predictionsData.set("loadingTitle", "Updating Data")
     predictionsData.set("loadingMessage", "Fetching ticker list")
     predictionsData.set("finishedUpdating", False)
     predictionsData.save()
@@ -53,14 +53,12 @@ def boot(window, settings):
 def updatePredictions(settings):
     
     # Executes all stages of prediction
-    predictionsData = build.safeLoad("data/predictions.datcs")
     baseTickers, trainingTickers = build.collectData(settings)
-    predictionsData = build.safeLoad("data/predictions.datcs")
-
     build.buildModels(settings, baseTickers, trainingTickers)
     build.makePredictions(settings)
 
     # Finishes updating
+    predictionsData = build.safeLoad("data/predictions.datcs")
     predictionsData.set("finishedUpdating", True)
     predictionsData.save()
 
