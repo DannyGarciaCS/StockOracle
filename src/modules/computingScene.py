@@ -52,13 +52,11 @@ def boot(window, settings):
 # Computational thread
 def updatePredictions(settings):
     
-    # Loads data avoiding update errors
-    predictionsData = DataFile("data/predictions.datcs")
-    while predictionsData.data == {}:
-        predictionsData = DataFile("data/predictions.datcs")
-
     # Executes all stages of prediction
+    predictionsData = build.safeLoad("data/predictions.datcs")
     baseTickers, trainingTickers = build.collectData(settings)
+    predictionsData = build.safeLoad("data/predictions.datcs")
+
     build.buildModels(settings, baseTickers, trainingTickers)
     build.makePredictions(settings)
 

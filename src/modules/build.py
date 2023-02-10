@@ -1,4 +1,5 @@
 # Imports
+import contextlib
 from bs4 import BeautifulSoup
 from src.classes.DataFile import DataFile
 import pandas_market_calendars as mcal
@@ -8,6 +9,7 @@ import yfinance as yf
 import requests
 import threading
 import pickle
+import sys
 import os
 from time import sleep
 import glob
@@ -15,12 +17,7 @@ import glob
 # Collects missing data
 def collectData(settings):
 
-    # Loads data avoiding update errors
-    predictionsData = DataFile("data/predictions.datcs")
-    while predictionsData.data == {}:
-        predictionsData = DataFile("data/predictions.datcs")
-
-    # Splits work amongst different usable processors
+    predictionsData = safeLoad("data/predictions.datcs")
     baseTickers, trainingTickers, jointTickers = buildCollection(settings)
 
     # Updates data if necessary
@@ -28,7 +25,8 @@ def collectData(settings):
         resetData(jointTickers, settings)
 
     # Saves date of update
-    today = dt.date.today().strftime("%d-%m-%Y")
+    today = dt.date.today().strftime("%d/%m/%Y")
+    
     predictionsData.set("dataUpdate", today)
     predictionsData.save()
 
@@ -86,12 +84,9 @@ def updateProgress(count):
     # Continues searching until we have all tickers
     found = len(next(os.walk("data/prices"))[1])
     while found < count:
-        found = len(next(os.walk("data/prices"))[1])
 
-        # Loads data avoiding update errors
-        predictionsData = DataFile("data/predictions.datcs")
-        while predictionsData.data == {}:
-            predictionsData = DataFile("data/predictions.datcs")
+        found = len(next(os.walk("data/prices"))[1])
+        predictionsData = safeLoad("data/predictions.datcs")
 
         # Prints current progress
         predictionsData.set("loadingMessage",
@@ -117,30 +112,33 @@ def initializeTicker(ticker):
     stock = yf.Ticker(ticker)
 
     # Loops over available time
-    for time in [["1m", "7d"], ["5m", "60d"], ["15m", "60d"],
-    ["1h", "730d"], ["1d", "max"], ["1wk", "max"]]:
+    for interval in ["1m", "5m", "15m", "1h", "1d", "1wk"]:
+        for period in ["max", "10y", "5y", "2y", "1y", "6mo", "3mo", "1mo", "5d", "1d"]:
 
-        fileName = f"{directory}/{ticker}_{time[0]}_{time[1]}.price"
-        fileContent = []
+            with contextlib.suppress(Exception):
 
-        # Fetches data
-        history = stock.history(interval=time[0], period=time[1])
-        indices = history.index.tolist()
-        for index in range(len(indices)): indices[index] = indices[index].strftime("%d-%m-%Y:%M-%H")
-        values = history.get(["High", "Low", "Volume"]).values.tolist()
+                fileName = f"{directory}/{ticker}_{interval}.price"
+                fileContent = []
 
-        # Saves data
-        fileContent.extend((indices[entry], values[entry]) for entry in range(len(indices)))
-        with open(fileName, 'wb') as file:
-            pickle.dump(fileContent, file)
+                # Fetches data
+                blockPrint()
+                history = stock.history(interval=interval, period=period)
+                enablePrint()
+                if len(history) == 0: continue
+                indices = history.index.tolist()
+                for index in range(len(indices)): indices[index] = indices[index].strftime("%d-%m-%Y:%M-%H")
+                values = history.get(["High", "Low", "Volume"]).values.tolist()
+
+                # Saves data
+                fileContent.extend((indices[entry], values[entry]) for entry in range(len(indices)))
+                with open(fileName, 'wb') as file:
+                    pickle.dump(fileContent, file)
+                break
 
 # Builds models used for predictions
 def buildModels(settings, baseTickers, trainingTickers):
     
-    # Loads data avoiding update errors
-    predictionsData = DataFile("data/predictions.datcs")
-    while predictionsData.data == {}:
-        predictionsData = DataFile("data/predictions.datcs")
+    predictionsData = safeLoad("data/predictions.datcs")
     
 
 
@@ -254,3 +252,18 @@ def fetchCollection(id):
         tickers.append(ticker)
 
     return tickers
+
+# Disable print
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore print
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+# Loads data avoiding update errors
+def safeLoad(path):
+    file = DataFile(path)
+    while file.data == {}:
+        file = DataFile(path)
+    return file
