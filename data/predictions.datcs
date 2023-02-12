@@ -1,5 +1,6 @@
-dataUpdate::"26/01/2023"
+dataUpdate::"10-02-2023"
 modelUpdate::"13/01/2023"
-loadingTitle::"Building Model"
-loadingMessage::"Generating training data"
+loadingTitle::"Updating data"
+loadingMessage::"Fetching ticker list"
 finishedUpdating::True
+displayedTicker::"MPC"

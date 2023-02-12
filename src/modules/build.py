@@ -9,7 +9,6 @@ import yfinance as yf
 import requests
 import threading
 import pickle
-import sys
 import os
 from time import sleep
 import glob
@@ -17,7 +16,12 @@ import glob
 # Collects missing data
 def collectData(settings):
 
-    predictionsData = safeLoad("data/predictions.datcs")
+    # Loads data avoiding update errors
+    predictionsData = DataFile("data/predictions.datcs")
+    while predictionsData.data == {}:
+        predictionsData = DataFile("data/predictions.datcs")
+
+    # Splits work amongst different usable processors
     baseTickers, trainingTickers, jointTickers = buildCollection(settings)
 
     # Updates data if necessary
@@ -25,8 +29,7 @@ def collectData(settings):
         resetData(jointTickers, settings)
 
     # Saves date of update
-    today = dt.date.today().strftime("%d/%m/%Y")
-    
+    today = dt.date.today().strftime("%d-%m-%Y")
     predictionsData.set("dataUpdate", today)
     predictionsData.save()
 
@@ -84,9 +87,12 @@ def updateProgress(count):
     # Continues searching until we have all tickers
     found = len(next(os.walk("data/prices"))[1])
     while found < count:
-
         found = len(next(os.walk("data/prices"))[1])
-        predictionsData = safeLoad("data/predictions.datcs")
+
+        # Loads data avoiding update errors
+        predictionsData = DataFile("data/predictions.datcs")
+        while predictionsData.data == {}:
+            predictionsData = DataFile("data/predictions.datcs")
 
         # Prints current progress
         predictionsData.set("loadingMessage",
@@ -100,7 +106,7 @@ def handleStack(settings, stack):
     ### Implemented multithreading solution here, but rate of download was too fast and locked database
     ### Will only do multiprocessing, no multithreading for data fetching
     for ticker in stack:
-        initializeTicker(ticker)
+            initializeTicker(ticker)
 
 # Builds ticker from scratch
 def initializeTicker(ticker):
@@ -111,88 +117,41 @@ def initializeTicker(ticker):
         os.makedirs(directory)
     stock = yf.Ticker(ticker)
 
-    # Loops over available time
-    for interval in ["1m", "5m", "15m", "1h", "1d", "1wk"]:
-        for period in ["max", "10y", "5y", "2y", "1y", "6mo", "3mo", "1mo", "5d", "1d"]:
+    fileName = f"{directory}/{ticker}.price"
+    fileContent = []
 
-            with contextlib.suppress(Exception):
+    # Fetches data
+    with contextlib.suppress(Exception):
+        
+        history = stock.history(interval="1d", period="max")
+        indices = history.index.tolist()
+        for index in range(len(indices)): indices[index] = indices[index].strftime("%d-%m-%Y:%M-%H")
+        values = history.get(["High", "Low", "Volume"]).values.tolist()
 
-                fileName = f"{directory}/{ticker}_{interval}.price"
-                fileContent = []
+        # Saves data
+        fileContent.extend((indices[entry], values[entry]) for entry in range(len(indices)))
 
-                # Fetches data
-                blockPrint()
-                history = stock.history(interval=interval, period=period)
-                enablePrint()
-                if len(history) == 0: continue
-                indices = history.index.tolist()
-                for index in range(len(indices)): indices[index] = indices[index].strftime("%d-%m-%Y:%M-%H")
-                values = history.get(["High", "Low", "Volume"]).values.tolist()
-
-                # Saves data
-                fileContent.extend((indices[entry], values[entry]) for entry in range(len(indices)))
-                with open(fileName, 'wb') as file:
-                    pickle.dump(fileContent, file)
-                break
+    with open(fileName, 'wb') as file:
+        pickle.dump(fileContent, file)
 
 # Builds models used for predictions
 def buildModels(settings, baseTickers, trainingTickers):
     
-    predictionsData = safeLoad("data/predictions.datcs")
-    predictionsData.set("loadingTitle", "Building Model")
-    predictionsData.set("loadingMessage", "Generating training data")
-    predictionsData.save()
-
-
-
-
-
-    periodLimits = settings.get("periodLimits")
-
-    for day in range(1):
-
-        end = dt.datetime.now() - dt.timedelta(days=day)
-        dayCompilation = formattedPrices(["AAPL", "AXP"], periodLimits, end)
-        print(len(dayCompilation))
-
-# Returns prices of tickers relevant to predictions
-def formattedPrices(tickers, periodLimits, end):
+    # Loads data avoiding update errors
+    predictionsData = DataFile("data/predictions.datcs")
+    while predictionsData.data == {}:
+        predictionsData = DataFile("data/predictions.datcs")
     
-    finalCompilation = []
-    for ticker in tickers:
-        localCompilation = []
+    print("building data")
 
-        # Loops over defined files
-        for period in [["1m", periodLimits[0]], ["5m", periodLimits[1]], ["15m", periodLimits[2]],
-        ["1h", periodLimits[3]], ["1h", periodLimits[4]], ["1d", periodLimits[5]], ["1wk", periodLimits[6]]]:
-        
-            with open(f"data/prices/{ticker}/{ticker}_{period[0]}.price", "rb") as file:
-                
-                # Initializes file data
-                data = pickle.load(file)
-                maxLength = period[1]
-                length = 0
 
-                # Loops over file
-                for line in data[::-1]:
 
-                    # Reached value limit
-                    date = dt.datetime.strptime(line[0], "%d-%m-%Y:%M-%H")
-                    if length == maxLength: break
+    #while True:
 
-                    # Adds fetched value
-                    elif date <= end:
-                        localCompilation.append(line[1])
-                        length += 1
-        
-        # Invalidates training compilation if there is insufficient data
-        if len(localCompilation) != sum(periodLimits):
-            finalCompilation = None
-            break
-        
-        # Add data if there were no issues
-        finalCompilation += localCompilation
-    return finalCompilation
+
+    #    for ticker in trainingTickers
+
+
 
 # Makes predictions using generated models
 def makePredictions(settings):
@@ -304,18 +263,3 @@ def fetchCollection(id):
         tickers.append(ticker)
 
     return tickers
-
-# Disable print
-def blockPrint():
-    sys.stdout = open(os.devnull, 'w')
-
-# Restore print
-def enablePrint():
-    sys.stdout = sys.__stdout__
-
-# Loads data avoiding update errors
-def safeLoad(path):
-    file = DataFile(path)
-    while file.data == {}:
-        file = DataFile(path)
-    return file

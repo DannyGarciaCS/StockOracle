@@ -3,6 +3,13 @@ from src.classes.DataFile import DataFile
 from src.classes.Button import Button
 from src.classes.Hint import Hint
 import src.modules.build as build
+import matplotlib
+from src.modules import util
+matplotlib.use("Agg")
+import matplotlib.backends.backend_agg as agg
+import pylab
+import pickle
+import numpy as np
 
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -51,7 +58,7 @@ def getMouse(window):
     return position, pressed, released
 
 # Generates ui elements
-def generateUI(window, settings, predictionsData, buttons=True, text=True, hints=True):
+def generateUI(window, settings, predictionsData, buttons=True, text=True, hints=True, graph=True):
 
     # More compact argument
     ms = settings.get("menuScale")
@@ -154,8 +161,67 @@ def generateUI(window, settings, predictionsData, buttons=True, text=True, hints
             (190 * ms, 40 * ms), "Date last predictions were built (red if out of date)",
             settings.get("debug"), "U", 250 * ms)
         ]
-
+    
+    if graph: buildGraph(ms, ui)
     return ui
+
+# Builds displayed graph
+def buildGraph(ms, ui):
+
+    # Loads ticker
+    predictionsData = util.safeLoad("data/predictions.datcs")
+    if os.path.exists(f"data/prices/{predictionsData.get('displayedTicker')}"):
+
+        # Loads price data
+        tickerName = predictionsData.get('displayedTicker')
+        with open(f"data/prices/{tickerName}/{tickerName}.price", "rb") as prices:
+
+            data = pickle.load(prices)
+            tickerPrices = [price[1][0] for price in data]
+            dataMean = np.mean(tickerPrices)
+
+            # Determines line color
+            lineColor = "#05C800" if data[-1][1][0] >= dataMean else "#D72323"
+            fillColor = "#329632" if data[-1][1][0] >= dataMean else "#A53232"
+
+        # Adjusts graph size
+        wFig = 1920 - 200 * ms
+        hFig = 540 - 100 * ms
+        fig = pylab.figure(figsize=[int(wFig/100), int(hFig/100)], dpi=100,)
+        fig.set_facecolor("#1E1E1E")
+
+        # Changes graph style
+        uiColor = "#dddddd"
+        ax = fig.gca()
+        ax.plot(tickerPrices, color=lineColor)
+        ax.plot([0, len(tickerPrices)], [tickerPrices[-1], tickerPrices[-1]], color=uiColor)
+        ax.fill_between(x=range(len(tickerPrices)), y1=tickerPrices, y2=0, color=fillColor)
+        ax.set_facecolor("#373737")
+        ax.spines["bottom"].set_color(uiColor)
+        ax.spines["top"].set_color(uiColor)
+        ax.spines["right"].set_color(uiColor)
+        ax.spines["left"].set_color(uiColor)
+        ax.tick_params(axis='x', colors=uiColor)
+        ax.tick_params(axis='y', colors=uiColor)
+        ax.set_xticks([], [])
+        ax.set_title(f"{tickerName} Price", color=uiColor, size="xx-large", weight="bold")
+        fig.tight_layout()
+        ax.margins(x=0)
+        ax.margins(y=0)
+
+        # Draws graph data
+        canvas = agg.FigureCanvasAgg(fig)
+        canvas.draw()
+        renderer = canvas.get_renderer()
+        graphData = renderer.tostring_rgb()
+        size = canvas.get_width_height()
+
+        # Saves finalized graphical surface
+        surface = pg.image.fromstring(graphData, size, "RGB")
+        surface = pg.transform.smoothscale(surface, (wFig, hFig))
+        ui["graph"] = surface
+
+    else: ui["graph"] = None
 
 # Handles input and visualization
 def handleUI(window, settings, ui, position, pressed, released, predictionsData):
@@ -173,6 +239,8 @@ def handleUI(window, settings, ui, position, pressed, released, predictionsData)
     1080 / 2 + 25 * ms, 1920 - 150 * ms, 1080 / 2 - 50 * ms))
     pg.draw.rect(window.display,  settings.get("CRmenuL"), pg.Rect(125 * ms,
     1080 / 2 + 25 * ms, 1920 - 150 * ms, 1080 / 2 - 50 * ms), round(4 * ms))
+
+    if ui["graph"] is not None: window.blit(ui["graph"], (150 * ms, 50 * ms))
 
     # Predictions body
     

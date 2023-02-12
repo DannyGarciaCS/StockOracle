@@ -36,8 +36,10 @@ TXTtitle::30
 # Prediction settings
 safeMode::False
 collectionNames::['SNP400','SNP500','SNP600','DOWINDUSTRIAL','DOWTRANSPORTATION','DOWUTILITY','NASDAQ100','RUSSELL1000']
-collections::[3]
-trainingCollections::[3]
-periodLimits::[300, 150, 300, 30, 30, 150, 40]
+collections::[0, 1, 2]
+trainingCollections::[1]
+samples::300
+trainingSplit::0.9
+
 
 debug::False
